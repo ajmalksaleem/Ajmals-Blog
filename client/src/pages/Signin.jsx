@@ -1,13 +1,15 @@
 import { Alert, Button, Label, TextInput } from "flowbite-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
-import { useState } from "react";
 import axios from "axios";
+import { signInStart, signInFailure, signInSuccess } from "../redux/user/userSlice";
+import { useDispatch , useSelector} from "react-redux";
+import Oauth from "../components/Oauth";
 
 const Signin = () => {
-  const [Loading , setLoading] = useState(false)
-  const [errorMessage, setErrorMessage] = useState(null);
   const navigate = useNavigate()
+  const dispatch = useDispatch()
+  const {loading : Loading, error :errorMessage } = useSelector(state=>state.user)
   const {
     register,
     handleSubmit,
@@ -16,21 +18,18 @@ const Signin = () => {
 
   const onSubmit = async (formData) => {
     try {
-      setLoading(true)
-      setErrorMessage(null)
+      dispatch(signInStart())
       const res = await axios.post('/api/auth/sign-in',{
         ...formData
       })
       const data = res.data
-      setLoading(false)
+      dispatch(signInSuccess(data))
       navigate('/')
     } catch (error) {
       if(error.response){
-        setErrorMessage(error.response.data.message)
-        setLoading(false)
+       dispatch(signInFailure(error.response.data.message))
       }else{
-        setErrorMessage(error.message)
-        setLoading(false)
+        dispatch(signInFailure(error.message))
       }
     }
   };
@@ -102,6 +101,7 @@ const Signin = () => {
           <Button gradientDuoTone="purpleToPink" type="submit" disabled={Loading}>
           {Loading? "Loading.." : ' Sign In'}
           </Button>
+        <Oauth />
         </form>
         <div className="flex mt-5 gap-2">
           <span>Haven't registered?</span>

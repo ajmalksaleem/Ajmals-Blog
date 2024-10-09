@@ -42,10 +42,44 @@ export const signin = async (req, res, next) => {
     const token = jwt.sign({ id: foundUser._id }, process.env.JWT_SECRETKEY, {
       expiresIn: "1d",
     });
-    res.status(200).cookie('access_token',token, {httpOnly: true})
-    const {password:pass, ...rest} = foundUser._doc
-    res.json(rest)
+    res.status(200).cookie("access_token", token, { httpOnly: true });
+    const { password: pass, ...rest } = foundUser._doc;
+    res.json(rest);
   } catch (error) {
     next(error);
+  }
+};
+
+export const googleAuth = async (req, res, next) => {
+  const { name, email, googlePhotoUrl } = req.body;
+  try {
+    const foundUser = await User.findOne({ email });
+    if (foundUser) {
+      const token = jwt.sign({ id: foundUser._id }, process.env.JWT_SECRETKEY, {
+        expiresIn: "1d",
+      });
+      const { password: pass, ...rest } = foundUser._doc;
+      res
+        .status(200)
+        .cookie("access_token", token, { httpOnly: true })
+        .json(rest);
+    } else {
+      const generatedPassword = Math.random().toString(36).slice(-8);
+      const hashedPassword = bcryptjs.hashSync(generatedPassword, 10);
+      const newUser = new User({
+        username: name.toLowerCase().split(' ').join('') + Math.random().toString(9).slice(-4),
+        email,
+        password: hashedPassword,
+        profilePicture : googlePhotoUrl
+      });
+      await newUser.save()
+      const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRETKEY, {
+        expiresIn: "1d",
+      })
+      const {password:pass, ...rest} = newUser._doc;
+      res.status(200).cookie("access_token", token, { httpOnly: true }).json(rest)
+    }
+  } catch (error) {
+    next(error)
   }
 };
