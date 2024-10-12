@@ -58,8 +58,22 @@ const signup = () => {
                 type="text"
                 placeholder="Username"
                 id="username"
-                {...register("username", { required: "username is required",   validate: (value) =>
-                  value.trim() !== '' || "Username cannot contain only spaces",  })}
+                {...register("username", { required: "username is required",
+                  validate : {
+                    noSpaces: (value) => {
+                    const trimmedValue = value.trim();
+                    return (
+                      trimmedValue !== '' &&
+                      trimmedValue === value &&
+                      !trimmedValue.includes(' ') ||
+                      "Username cannot contain spaces"
+                    );
+                  },
+                    lowercase: (value) => {
+                      return value === value.toLowerCase() || "Username must be in lowercase";
+                    },
+                  },
+                })}
               />
               {errors.username && (
                 <p className="text-sm mt-2 text-red-500">

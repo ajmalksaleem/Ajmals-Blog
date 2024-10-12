@@ -3,10 +3,12 @@ import connectDb from "./db/connection.js";
 import { config } from "dotenv";
 import userRoutes from "./routes/user.routes.js";
 import authRoutes from "./routes/auth.routes.js";
+import cookieParser from "cookie-parser";
 
 const app = express();
 app.use(express.json());
 config();
+app.use(cookieParser())
 
 connectDb()
   .then(() => {

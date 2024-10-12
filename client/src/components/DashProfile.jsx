@@ -1,30 +1,37 @@
 import { Alert, Button, Label, TextInput } from "flowbite-react";
 import { useEffect, useRef, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { app } from "../firebase";
-import { CircularProgressbar } from 'react-circular-progressbar';
-import 'react-circular-progressbar/dist/styles.css';
-import {
-  getDownloadURL,
-  getStorage,
-  ref,
-  uploadBytesResumable,
-} from "firebase/storage";
+import { CircularProgressbar } from "react-circular-progressbar";
+import "react-circular-progressbar/dist/styles.css";
+import {getDownloadURL, getStorage, ref, uploadBytesResumable,} from "firebase/storage";
+import { useForm } from "react-hook-form";
+import axios from "axios";
+import { signInStart,signInSuccess, signInFailure } from "../redux/user/userSlice"; 
 
 const DashProfile = () => {
-  const { currentUser } = useSelector((state) => state.user);
+  const { currentUser } = useSelector((state) => state.user); 
   const [imageFile, setImageFile] = useState(null);
   const [filePercentage, setfilePercentage] = useState(null);
   const [fileUploadError, setfileUploadError] = useState(false);
-  const [profilePicture, setprofilePicture] =useState(null)
+  const [profilePicture, setprofilePicture] = useState(null);
   const filepickRef = useRef();
+
+  const {
+    register,
+    reset,
+    handleSubmit,
+    formState: { errors,dirtyFields},
+  } = useForm({ mode: "onChange", defaultValues : {...currentUser} });
+
+const dispatch = useDispatch()
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
       setImageFile(file);
     }
-  }
+  };
 
   useEffect(() => {
     if (imageFile) {
@@ -33,13 +40,13 @@ const DashProfile = () => {
   }, [imageFile]);
 
   const uploadImage = async (imageFile) => {
-    setfileUploadError(null)
+    setfileUploadError(null);
     const storage = getStorage(app);
     const fileName = new Date().getTime() + imageFile.name;
     const storageRef = ref(storage, fileName);
     const uploadTask = uploadBytesResumable(storageRef, imageFile);
     uploadTask.on(
-      'state_changed',
+      "state_changed",
       (snapshot) => {
         const progress =
           (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
@@ -47,21 +54,56 @@ const DashProfile = () => {
       },
       (error) => {
         setfileUploadError(true);
-        setfilePercentage(null)
-        setImageFile(null)
+        setfilePercentage(null);
+        setImageFile(null);
       },
       () => {
         getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-          setprofilePicture(downloadURL)
+          setprofilePicture(downloadURL);
         });
       }
     );
   };
 
+  const handleUpdate = async (formData) => {
+    const updatedValues = {}
+    if(dirtyFields.username){
+      updatedValues.username = formData.username
+    }
+    if(dirtyFields.email){
+      updatedValues.email = formData.email
+    }
+    if(dirtyFields.password){
+      updatedValues.password = formData.password
+    }
+    if(profilePicture){
+      updatedValues.profilePicture = profilePicture
+    }
+    reset({},{keepValues: true})
+    if(Object.keys(updatedValues).length === 0) return ;
+    try {
+      dispatch(signInStart())
+      const res = await axios.put(`/api/user/update/${currentUser._id}`,{
+        ...updatedValues
+      })
+      const data = res.data;
+      dispatch(signInSuccess(data))
+    } catch (error) {
+      if(error.response){
+        dispatch(signInFailure(error.response.data.message))
+       }else{
+         dispatch(signInFailure(error.message))
+       }
+    }
+  };
+ 
   return (
     <div className="mx-auto max-w-lg w-full p-3 ">
       <h1 className="my-7 text-center font-semibold text-3xl">Profile</h1>
-      <form className="flex flex-col gap-2 ">
+      <form
+        className="flex flex-col gap-2"
+        onSubmit={handleSubmit(handleUpdate)}
+      >
         <input
           type="file"
           accept="image/*"
@@ -74,52 +116,96 @@ const DashProfile = () => {
           onClick={() => filepickRef.current.click()}
         >
           {filePercentage && (
-            <CircularProgressbar value={filePercentage || 0 } text={`${filePercentage}%`} strokeWidth={5}
-            styles={{
-              root : {
-                width: '100%',
-                  height: '100%',
-                  position: 'absolute',
+            <CircularProgressbar
+              value={filePercentage || 0}
+              text={`${filePercentage}%`}
+              strokeWidth={5}
+              styles={{
+                root: {
+                  width: "100%",
+                  height: "100%",
+                  position: "absolute",
                   top: 0,
                   left: 0,
-              },
-              path:{
-                stroke : `rgba(62, 152, 199, ${
-                  filePercentage / 100
-                })`,
-              },
-            }}/>
+                },
+                path: {
+                  stroke: `rgba(62, 152, 199, ${filePercentage / 100})`,
+                },
+              }}
+            />
           )}
           <img
             src={profilePicture || currentUser.profilePicture}
             alt="user"
-            className= { `rounded-full w-full h-full object-cover border-8 border-[lightgray]
-              ${
-              filePercentage &&
-              filePercentage < 100 &&
-              'opacity-60'
-            }
+            className={`rounded-full w-full h-full object-cover border-8 border-[lightgray]
+              ${filePercentage && filePercentage < 100 && "opacity-60"}
               `}
           />
         </div>
-        {fileUploadError &&(
-        <Alert color='failure'>Could not upload image (File must be less than 2MB)</Alert>
-        ) }
+        {fileUploadError && (
+          <Alert color="failure">
+            Could not upload image (File must be less than 2MB)
+          </Alert>
+        )}
         <Label value="Your Username" />
         <TextInput
           type="text"
-          defaultValue={currentUser.username}
           placeholder="Username"
+          {...register("username", {
+            required: "username is required",
+            validate: {
+              noSpaces: (value) => {
+                const trimmedValue = value.trim();
+                return (
+                  (trimmedValue !== "" &&
+                    trimmedValue === value &&
+                    !trimmedValue.includes(" ")) ||
+                  "Username cannot contain spaces"
+                );
+              },
+              lowercase: (value) => {
+                return (
+                  value === value.toLowerCase() ||
+                  "Username must be in lowercase"
+                );
+              },
+            },
+          })}
         />
+        {errors.username && (
+          <p className="text-sm mt-2 text-red-500">{errors.username.message}</p>
+        )}
         <Label value="Your email" />
         <TextInput
           type="email"
-          defaultValue={currentUser.email}
+         
           placeholder="email"
+          {...register("email", {
+            required: "email is required",
+            pattern: {
+              value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+              message: "Please enter a valid email address",
+            },
+          })}
         />
+        {errors.email && (
+          <p className="text-sm mt-2 text-red-500">{errors.email?.message}</p>
+        )}
         <Label value="Your paswword" />
-        <TextInput type="password" placeholder="Password" />
-        <Button type="submit" gradientDuoTone="purpleToBlue" className="mt-4">
+        <TextInput type="password" placeholder="Password" 
+         {...register("password", {
+          minLength: {
+            value :4,
+            message : "Password must be more than 4 characters"
+          }
+        })}
+        />
+         {errors.password && (
+                <p className="text-sm mt-2 text-red-500">
+                  {errors.password?.message}
+                </p>
+              )}
+        <Button type="submit"  gradientDuoTone="purpleToBlue" className="mt-4">
           Update
         </Button>
         <Button
@@ -136,6 +222,3 @@ const DashProfile = () => {
 };
 
 export default DashProfile;
-
-
-  

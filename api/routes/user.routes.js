@@ -1,7 +1,9 @@
 import { Router } from "express";
-const router =Router()
-import { test } from "../controllers/user.controller.js";
+import { UpdateUser } from "../controllers/user.controller.js";
+import { verifyUser } from "../utils/verifyUser.js";
 
-router.get('/test',test)
+const router =Router()
+
+router.put('/update/:userId', verifyUser, UpdateUser)
 
 export default router;
