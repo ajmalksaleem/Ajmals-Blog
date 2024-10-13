@@ -39,7 +39,7 @@ export const signin = async (req, res, next) => {
     );
     if (!validdatePassword)
       return next(errorHandler(401, "Password or Email is incorrect"));
-    const token = jwt.sign({ id: foundUser._id }, process.env.JWT_SECRETKEY, {
+    const token = jwt.sign({ id: foundUser._id, isAdmin :foundUser.isAdmin }, process.env.JWT_SECRETKEY, {
       expiresIn: "1d",
     });
     res.status(200).cookie("access_token", token, { httpOnly: true });
@@ -55,7 +55,7 @@ export const googleAuth = async (req, res, next) => {
   try {
     const foundUser = await User.findOne({ email });
     if (foundUser) {
-      const token = jwt.sign({ id: foundUser._id }, process.env.JWT_SECRETKEY, {
+      const token = jwt.sign({ id: foundUser._id, isAdmin :foundUser.isAdmin  }, process.env.JWT_SECRETKEY, {
         expiresIn: "1d",
       });
       const { password: pass, ...rest } = foundUser._doc;
@@ -73,7 +73,7 @@ export const googleAuth = async (req, res, next) => {
         profilePicture : googlePhotoUrl
       });
       await newUser.save()
-      const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRETKEY, {
+      const token = jwt.sign({ id: newUser._id, isAdmin : newUser.isAdmin }, process.env.JWT_SECRETKEY, {
         expiresIn: "1d",
       })
       const {password:pass, ...rest} = newUser._doc;
