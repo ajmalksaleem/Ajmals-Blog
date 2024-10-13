@@ -1,5 +1,5 @@
 import { Sidebar } from 'flowbite-react'
-import {HiArrowSmRight, HiUser} from 'react-icons/hi'
+import {HiArrowSmRight, HiDocumentText, HiUser} from 'react-icons/hi'
 import { MdCreate } from "react-icons/md";
 import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
@@ -32,15 +32,20 @@ const DashSidebar = () => {
   return (
     <Sidebar className='w-full md:w-56'>
         <Sidebar.Items>
-            <Sidebar.ItemGroup>
+            <Sidebar.ItemGroup className='flex flex-col gap-1'>
              <Link to='/dashboard?tab=profile'>  
              <Sidebar.Item as='div' active={tab==='profile'} icon={HiUser} label={currentUser.isAdmin? 'Admin' : 'User'} labelColor='dark'>
               Profile</Sidebar.Item>
              </Link>
              {currentUser.isAdmin && (
+              <>
              <Link to='/createpost'>  
              <Sidebar.Item as='div'  icon={MdCreate} >Create Post</Sidebar.Item>
              </Link>
+             <Link to='/dashboard?tab=posts'>  
+             <Sidebar.Item as='div' active={tab==='posts'} icon={HiDocumentText} >Posts</Sidebar.Item>
+             </Link>
+             </>
              )}
                 <Sidebar.Item icon={HiArrowSmRight} className='cursor-pointer' onClick={handleSignout}>SignOut</Sidebar.Item>
             </Sidebar.ItemGroup>
