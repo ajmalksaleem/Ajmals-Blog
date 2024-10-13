@@ -47,8 +47,7 @@ const dispatch = useDispatch()
     const fileName = new Date().getTime() + imageFile.name;
     const storageRef = ref(storage, fileName);
     const uploadTask = uploadBytesResumable(storageRef, imageFile);
-    uploadTask.on(
-      "state_changed",
+    uploadTask.on("state_changed",
       (snapshot) => {
         const progress =
           (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
@@ -61,6 +60,7 @@ const dispatch = useDispatch()
       },
       () => {
         getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+          setfilePercentage(null);
           setprofilePicture(downloadURL);
         });
       }
