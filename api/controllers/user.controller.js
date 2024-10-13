@@ -50,9 +50,17 @@ export const DeleteUser = async (req,res,next)=>{
   if(req.user.id !== req.params.userId) return next(errorHandler(401, 'You can only delete your own account'))
     try {
       await User.findByIdAndDelete(req.params.userId)
-      res.clearCookie('access_token', { path: '/' });
+      res.clearCookie('access_token');
       res.status(200).json({message : "user deleted"})
     } catch (error) {
       next(error)
     }
+}
+
+export const SignOut = async(req,res,next)=>{
+  try {
+    res.clearCookie('access_token').status(200).json('user has been signed out')
+  } catch (error) {
+    next(error)
+  }
 }

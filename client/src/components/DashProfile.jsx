@@ -103,7 +103,7 @@ const dispatch = useDispatch()
     setShowModal(false)
     try {
       dispatch(clearUserStart())
-      const res = axios.delete(`/api/user/delete/${currentUser._id}`)
+      const res = await axios.delete(`/api/user/delete/${currentUser._id}`)
       const data = res.data;
       dispatch(clearUserSuccess(data))
     } catch (error) {
