@@ -1,4 +1,4 @@
-import { Alert, Button, Label, TextInput } from "flowbite-react";
+import { Alert, Button, Label, Modal, TextInput } from "flowbite-react";
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { app } from "../firebase";
@@ -7,14 +7,16 @@ import "react-circular-progressbar/dist/styles.css";
 import {getDownloadURL, getStorage, ref, uploadBytesResumable,} from "firebase/storage";
 import { useForm } from "react-hook-form";
 import axios from "axios";
-import { signInStart,signInSuccess, signInFailure } from "../redux/user/userSlice"; 
+import { signInStart,signInSuccess, signInFailure, clearUserFailure,clearUserStart,clearUserSuccess } from "../redux/user/userSlice"; 
+import {HiOutlineExclamationCircle} from 'react-icons/hi'
 
 const DashProfile = () => {
-  const { currentUser } = useSelector((state) => state.user); 
+  const { currentUser,error,loading } = useSelector((state) => state.user); 
   const [imageFile, setImageFile] = useState(null);
   const [filePercentage, setfilePercentage] = useState(null);
   const [fileUploadError, setfileUploadError] = useState(false);
   const [profilePicture, setprofilePicture] = useState(null);
+  const [showModal, setShowModal] = useState(false)
   const filepickRef = useRef();
 
   const {
@@ -96,6 +98,22 @@ const dispatch = useDispatch()
        }
     }
   };
+
+  const handleDeleteAccount = async()=>{
+    setShowModal(false)
+    try {
+      dispatch(clearUserStart())
+      const res = axios.delete(`/api/user/delete/${currentUser._id}`)
+      const data = res.data;
+      dispatch(clearUserSuccess(data))
+    } catch (error) {
+      if(error.response){
+        dispatch(clearUserFailure(error.response.data.message))
+       }else{
+         dispatch(clearUserFailure(error.message))
+       }
+    }
+  }
  
   return (
     <div className="mx-auto max-w-lg w-full p-3 ">
@@ -210,13 +228,30 @@ const dispatch = useDispatch()
         </Button>
         <Button
           gradientDuoTone="pinkToOrange"
-          className="mb-10"
+          className="mb-5"
           outline
           type="button"
+          onClick={()=>setShowModal(true)}
         >
           Delete Account
         </Button>
       </form>
+      {error && (
+        <Alert color='failure' className="mb-4">{error}</Alert>
+      )}
+      <Modal show={showModal} onClose={()=>setShowModal(false)} popup size='md'>
+              <Modal.Header/>
+              <Modal.Body>
+                <div className="text-center">
+                  <HiOutlineExclamationCircle className="h-14 w-14 text-gray-400 dark:text-gray-200 mb-4 mx-auto"/>
+                  <h3 className="mb-5 text-lg text-gray-600">Are you sure that you want to delete your account?</h3>
+                </div>
+                <div className="flex justify-center gap-4">
+                  <Button color='success' onClick={()=>setShowModal(false)}>No, Cancel</Button>
+                  <Button color='failure' onClick={handleDeleteAccount}>Yes, i'm sure</Button>
+                </div>
+              </Modal.Body>
+      </Modal>
     </div>
   );
 };
