@@ -97,6 +97,8 @@ const CreatePost = () => {
             <option value="javascript">JavaScript</option>
             <option value="react">React</option>
             <option value="mongodb">mongodb</option>
+            <option value="nodejs">Nodejs</option>
+            <option value="css">css</option>
           </Select>
         </div>
         <div className="flex gap-4 items-center justify-between border-4 border-teal-500 border-dotted p-3">
@@ -127,6 +129,7 @@ const CreatePost = () => {
         {imageUploadError && <Alert color='failure'>{imageUploadError}</Alert>}
         {imagelink && <img src={imagelink} alt="upload" className="w-full h-72 object-cover"/>}
         <ReactQuill
+        theme='snow'
           placeholder="Write something"
           className="h-72 mb-12"
           required
