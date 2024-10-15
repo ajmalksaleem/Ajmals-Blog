@@ -64,3 +64,34 @@ export const SignOut = async(req,res,next)=>{
     next(error)
   }
 }
+
+export const GetUsers = async(req,res,next)=>{
+  if(!req.user.isAdmin){
+    return next(errorHandler(403, 'You are not to see all users'))
+  }
+  try {
+    const startIndex = req.query.startIndex || 0;
+    const limit = parseInt(req.query.limit) || 9;
+    const sortDirection = req.query.sort === "asc" ? 1 : -1;
+    const users = await User.find()
+    .sort({ updatedAt: sortDirection })
+    .select('-password')
+      .skip(startIndex)
+      .limit(limit);
+    const totalUsers = await User.countDocuments()
+    const now = new Date();
+    const oneMonthAgo = new Date(
+      now.getFullYear(),
+      now.getMonth() - 1,
+      now.getDate()
+    );
+    const lastMonthUsers = await User.countDocuments({
+      createdAt: { $gte: oneMonthAgo }
+    })
+    res.status(200).json({
+      users,totalUsers,lastMonthUsers
+    })
+  } catch (error) {
+    next(error)
+  }
+}

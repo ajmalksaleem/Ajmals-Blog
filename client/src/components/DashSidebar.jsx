@@ -1,5 +1,5 @@
 import { Sidebar } from 'flowbite-react'
-import {HiArrowSmRight, HiDocumentText, HiUser} from 'react-icons/hi'
+import {HiArrowSmRight, HiDocumentText, HiUser, HiUserGroup} from 'react-icons/hi'
 import { MdCreate } from "react-icons/md";
 import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
@@ -44,6 +44,9 @@ const DashSidebar = () => {
              </Link>
              <Link to='/dashboard?tab=posts'>  
              <Sidebar.Item as='div' active={tab==='posts'} icon={HiDocumentText} >Posts</Sidebar.Item>
+             </Link>
+             <Link to='/dashboard?tab=users'>  
+             <Sidebar.Item as='div' active={tab==='users'} icon={HiUserGroup} >Users</Sidebar.Item>
              </Link>
              </>
              )}
