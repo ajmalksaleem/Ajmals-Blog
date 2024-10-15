@@ -1,27 +1,52 @@
 import {getDownloadURL, getStorage, ref, uploadBytesResumable,} from "firebase/storage";
 import { Alert, Button, FileInput, Select, TextInput } from "flowbite-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import { app } from "../firebase";
 import { CircularProgressbar } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
-import { useForm } from "react-hook-form";
 import axios from "axios";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { useParams } from 'react-router-dom';
 
-const CreatePost = () => {
+const UpdatePost = () => {
   const [file, SetFile] = useState(null);
   const [imageUploadProgress, setImageUploadprogress] = useState(null);
   const [imageUploadError, setImageUploadError] = useState(null);
-  const [publishError, setpublishError] = useState('');
-  const [imagelink, setImagelink] = useState(null);
-  const [quilData, setQuilData] = useState(null);
-
-  const { register, handleSubmit, formState: {errors}} = useForm({ mode: "onChange" });
+  const [publishError, setpublishError] = useState(null);
+  // const [formData,setFormdata] = useState({})
+  const [formData, setFormdata] = useState({
+    title: '',
+    category: 'uncategorized',
+    content: '',
+    image: '',
+  });
   const {currentUser} = useSelector(state=>state.user)
   const navigate = useNavigate()
+  const { postId } = useParams();
+
+  useEffect(() => {
+    const fetchPost = async () => {
+      try {
+        const res = await axios.get(`/api/post/getPosts?postId=${postId}`);
+        const { data } = res;
+        setFormdata(data.posts[0]);
+        setpublishError(null);
+      } catch (error) {
+        if (error.response) {
+          setpublishError(error.response.data.message);
+          console.log(error.response.data.message);
+        } else {
+          setpublishError(error.message);
+          console.log(error.message);
+        }
+      }
+    };
+    fetchPost();
+  }, [postId]);
+  
 
   const handleImageupload = async () => {
     try {
@@ -50,7 +75,7 @@ const CreatePost = () => {
           getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
             setImageUploadprogress(null);
             setImageUploadError(null);
-            setImagelink(downloadURL);
+            setFormdata({...formData,image:downloadURL})
           });
         }
       );
@@ -60,13 +85,14 @@ const CreatePost = () => {
     }
   };
 
-  const handleCreatePost = async(postData)=>{
+  const handleSubmit = async(e)=>{
+    e.preventDefault()
         try {
-            const res = await axios.post('/api/post/create',{
-                ...postData, ...quilData, userId : currentUser._id,
-               ...(imagelink && {image:imagelink})
+            const res = await axios.put(`/api/post/updatepost/${postId}/${currentUser._id}`,{
+                ...formData
             })
             const{data} = res;
+            setpublishError(null)
             navigate(`/post/${data.slug}`)
         } catch(error) {
             if(error.response){
@@ -80,20 +106,23 @@ const CreatePost = () => {
 
   return (
     <div className="p-3 max-w-3xl mx-auto min-h-screen">
-      <h1 className="text-center text-3xl my-7 font-semibold">Create a Post</h1>
-      <form className="flex flex-col gap-4" onSubmit={handleSubmit(handleCreatePost)}>
+      <h1 className="text-center text-3xl my-7 font-semibold">Update a Post</h1>
+      <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
         <div className="flex flex-col gap-4 sm:flex-row justify-between">
           <TextInput
             type="text"
             placeholder="title"
             required
+            id='title'
             className="flex-1"
-            {...register("title", {required: "title is required"} )}
+            onChange={(e)=>setFormdata({...formData,title:e.target.value})}
+            value={formData.title}
           />
-          {errors.title && (
-          <p className="text-sm mt-2 text-red-500">{errors.title.message}</p>
-        )}
-          <Select {...register("category")}>
+          <Select
+          value={formData.category}
+           onChange={(e) =>
+            setFormdata({ ...formData, category: e.target.value })
+          }>
             <option value="uncategorized">Select a category</option>
             <option value="javascript">JavaScript</option>
             <option value="react">React</option>
@@ -128,16 +157,25 @@ const CreatePost = () => {
           </Button>
         </div>
         {imageUploadError && <Alert color='failure'>{imageUploadError}</Alert>}
-        {imagelink && <img src={imagelink} alt="upload" className="w-full h-72 object-cover"/>}
+         {formData.image && (
+          <img
+            src={formData.image}
+            alt='upload'
+            className='w-full h-72 object-cover'
+          />
+        )}
         <ReactQuill
+        value={formData.content || ''}
         theme='snow'
           placeholder="Write something"
           className="h-72 mb-12"
           required
-          onChange={(value)=>{setQuilData({content:value})}}
+          onChange={(value) => {
+            setFormdata({ ...formData, content: value });
+          }}
         />
-        <Button type="submit" gradientDuoTone="purpleToBlue" className="mb-3">
-          Publish
+        <Button  disabled={imageUploadProgress} type="submit" gradientDuoTone="purpleToBlue" className="mb-3">
+          update
         </Button>
         {publishError && (
             <Alert className="mb-6" color='failure'>{publishError}</Alert>
@@ -147,4 +185,4 @@ const CreatePost = () => {
   );
 };
 
-export default CreatePost;
+export default UpdatePost;

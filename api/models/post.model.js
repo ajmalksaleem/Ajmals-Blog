@@ -15,7 +15,7 @@ const postSchema = new Schema({
     },
     image :{
         type : String,
-        default : 'https://img.freepik.com/free-photo/programming-background-collage_23-2149901789.jpg?t=st=1728814459~exp=1728818059~hmac=db061cf0db7bdc3fc2aa223f6a28058670bf02a451e007229d39b5faf12dc3bc&w=826'
+        default : 'https://i.pinimg.com/originals/f2/72/94/f272943e5355a948e9430a8c79e6f1cb.jpg'
     },
     category: {
         type: String,

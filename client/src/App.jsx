@@ -1,10 +1,9 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { About, Signin, Signup, Home, Dashboard } from "./pages/index.pages";
+import { About, Signin, Signup, Home, Dashboard, CreatePost, UpdatePost } from "./pages/index.pages";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import PrivateRoutes from "./components/privateRoutes";
 import PublicRoutes from "./components/PublicRoutes";
-import CreatePost from "./pages/CreatePost";
 import AdminRoutes from "./components/AdminRoutes";
 
 const App = () => {
@@ -21,7 +20,8 @@ const App = () => {
         <Route element={<PrivateRoutes />}>
           <Route path="/dashboard" element={<Dashboard />} />
           <Route element={<AdminRoutes />}>
-            <Route path="/createpost" element={<CreatePost />} />
+            <Route path="/createpost" element={<CreatePost/>} />
+            <Route path="/update-post/:postId" element={<UpdatePost/>} />
           </Route>
         </Route>
       </Routes>
