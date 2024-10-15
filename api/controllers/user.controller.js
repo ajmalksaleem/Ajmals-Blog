@@ -67,7 +67,7 @@ export const SignOut = async(req,res,next)=>{
 
 export const GetUsers = async(req,res,next)=>{
   if(!req.user.isAdmin){
-    return next(errorHandler(403, 'You are not to see all users'))
+    return next(errorHandler(403, 'You are not allowed to see all users'))
   }
   try {
     const startIndex = req.query.startIndex || 0;
