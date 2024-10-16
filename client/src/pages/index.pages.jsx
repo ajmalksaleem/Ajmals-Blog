@@ -5,5 +5,6 @@ import Signup from "./signup"
 import Dashboard from './dashboard'
 import CreatePost from "./CreatePost";
 import UpdatePost from "./UpdatePost";
+import PostPage from "./PostPage";
 
-export {About,Home,Signup,Signin, Dashboard, CreatePost,UpdatePost}
+export {About,Home,Signup,Signin, Dashboard, CreatePost,UpdatePost,PostPage}

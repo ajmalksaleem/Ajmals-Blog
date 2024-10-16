@@ -8,31 +8,26 @@ import { CircularProgressbar } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
 import axios from "axios";
 import { useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
-import { useParams } from 'react-router-dom';
+import { useNavigate,useParams } from "react-router-dom";
 
 const UpdatePost = () => {
-  const [file, SetFile] = useState(null);
+  const [file, setFile] = useState(null);
   const [imageUploadProgress, setImageUploadprogress] = useState(null);
   const [imageUploadError, setImageUploadError] = useState(null);
   const [publishError, setpublishError] = useState(null);
-  // const [formData,setFormdata] = useState({})
-  const [formData, setFormdata] = useState({
-    title: '',
-    category: 'uncategorized',
-    content: '',
-    image: '',
-  });
+   const [formData,setFormdata] = useState({})
+   const [postdata,setpostdata] = useState({})
   const {currentUser} = useSelector(state=>state.user)
   const navigate = useNavigate()
   const { postId } = useParams();
 
   useEffect(() => {
-    const fetchPost = async () => {
+    const fetchPost = async() => {
       try {
         const res = await axios.get(`/api/post/getPosts?postId=${postId}`);
         const { data } = res;
-        setFormdata(data.posts[0]);
+      setpostdata(data.posts[0]);
+      setFormdata({...formData,content:data.posts[0].content})
         setpublishError(null);
       } catch (error) {
         if (error.response) {
@@ -46,7 +41,6 @@ const UpdatePost = () => {
     };
     fetchPost();
   }, [postId]);
-  
 
   const handleImageupload = async () => {
     try {
@@ -116,10 +110,10 @@ const UpdatePost = () => {
             id='title'
             className="flex-1"
             onChange={(e)=>setFormdata({...formData,title:e.target.value})}
-            value={formData.title}
+            value={postdata?.title }
           />
           <Select
-          value={formData.category}
+          value={postdata.category}
            onChange={(e) =>
             setFormdata({ ...formData, category: e.target.value })
           }>
@@ -135,7 +129,7 @@ const UpdatePost = () => {
           <FileInput
             type="file"
             accept="image/*"
-            onChange={(e) => SetFile(e.target.files[0])}
+            onChange={(e) => setFile(e.target.files[0])}
           />
           <Button
             gradientDuoTone="purpleToBlue"
@@ -157,12 +151,19 @@ const UpdatePost = () => {
           </Button>
         </div>
         {imageUploadError && <Alert color='failure'>{imageUploadError}</Alert>}
-         {formData.image && (
+
+         {formData.image ? (
           <img
             src={formData.image}
             alt='upload'
             className='w-full h-72 object-cover'
-          />
+            />
+        ) : (
+          <img
+            src={postdata.image}
+            alt='upload'
+            className='w-full h-72 object-cover'
+            />
         )}
         <ReactQuill
         value={formData.content || ''}
@@ -186,3 +187,5 @@ const UpdatePost = () => {
 };
 
 export default UpdatePost;
+
+
