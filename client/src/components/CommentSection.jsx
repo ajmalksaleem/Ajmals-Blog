@@ -1,10 +1,11 @@
-import { Alert, Button, Textarea } from "flowbite-react";
+import { Alert, Button, Modal, Textarea } from "flowbite-react";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import moment from "moment";
 import { FaThumbsUp } from "react-icons/fa";
+import { MdVerified } from "react-icons/md";
 
 const CommentSection = ({ postId }) => {
   const { currentUser } = useSelector((state) => state.user);
@@ -12,6 +13,9 @@ const CommentSection = ({ postId }) => {
   const [commentError, setcommentError] = useState(null);
   const [PostComments, setPostComments] = useState([]);
   const [refreshComment, setrefreshComment] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [editValue, seteditValue] = useState('');
+  const [editCommentId, seteditCommentId] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -69,6 +73,41 @@ const CommentSection = ({ postId }) => {
       console.log(data);
     } catch (error) {}
   };
+  
+  const handlecommentEdit = (commentId,commentcontent)=>{
+      setShowModal(true)
+      seteditValue(commentcontent)  
+      seteditCommentId(commentId)   
+  }
+
+  const editComment = async()=>{
+    try {
+      if (editValue < 1 || editValue > 200) return;
+        try {
+          const res = await axios.put(`/api/comment/editcomment/${editCommentId}`,{
+            content : editValue
+          })
+          const {data} = res;
+          setPostComments(
+            PostComments.map((editedcomment) =>
+              editedcomment._id === editCommentId
+                ? {
+                    ...editedcomment,
+                    content: data.content,
+                  }
+                : editedcomment
+            )
+          );
+          setShowModal(false)
+          seteditValue('')
+          seteditCommentId(null)
+        } catch (error) {
+          
+        }
+    } catch (error) {
+      
+    }
+  }
 
   return (
     <div className="max-w-3xl mx-auto w-full p-3">
@@ -147,11 +186,13 @@ const CommentSection = ({ postId }) => {
                 />
               </div>
               <div className="flex-1">
-                <div className="">
-                  <span className="font-bold mr-3 text-xs truncate ">
+                <div className="flex items-center">
+                  <span className="font-bold  text-xs truncate ">
                     {comment.userId?.username ?? "Anonymous User"}
                   </span>
-                  <span className="text-gray=500 text-xs">
+                  {comment.userId?.isAdmin && <MdVerified className="text-xs mx-1 text-blue-500 "/>
+                  }
+                  <span className="text-gray=500 text-xs ml-3">
                     {moment(comment.createdAt).fromNow()}
                   </span>
                 </div>
@@ -171,18 +212,40 @@ const CommentSection = ({ postId }) => {
                   >
                     <FaThumbsUp className="text-sm" />
                   </button>
-                  <p className="text-gray-500">
+                  <p className="text-gray-500 dark:text-gray-400">
                     {comment.numberOfLikes > 0 &&
                       comment.numberOfLikes +
                         " " +
                         (comment.numberOfLikes === 1 ? "like" : "likes")}
                   </p>
+                  {(comment.userId?._id === currentUser?._id) && (
+                    <button onClick={()=>handlecommentEdit(comment._id,comment.content)} className="hover:text-blue-500 text-gray-700 dark:text-gray-300 dark:hover:text-blue-500">
+                      edit
+                    </button>
+                  )}
                 </div>
               </div>
             </div>
           ))}
         </>
       )}
+      <Modal show={showModal} onClose={()=>setShowModal(false)} popup size='lg'>
+              <Modal.Header className="mx-auto">EDIT COMMENT</Modal.Header>
+              <Modal.Body>
+                <div className="">
+                <Textarea
+                value={editValue}
+                 rows="4"
+                 maxLength="200"
+                onChange={(e)=>seteditValue(e.target.value)}
+                />
+                <div className="flex justify-center gap-4 mt-3">
+                <Button color='failure' onClick={()=>setShowModal(false)}>Cancel</Button>
+                <Button color='success'onClick={()=>editComment()}>Edit Comment</Button>
+                </div>
+                </div>
+              </Modal.Body>
+      </Modal>
     </div>
   );
 };
