@@ -1,13 +1,31 @@
 import { Alert, Button, Textarea } from "flowbite-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
+import moment from "moment";
+import { FaThumbsUp } from "react-icons/fa";
 
 const CommentSection = ({ postId }) => {
   const { currentUser } = useSelector((state) => state.user);
   const [comment, setComment] = useState("");
   const [commentError, setcommentError] = useState(null);
+  const [PostComments, setPostComments] = useState([]);
+  const [refreshComment, setrefreshComment] = useState(false);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchComments = async () => {
+      try {
+        const res = await axios.get(`/api/comment/getcomments/${postId}`);
+        const { data } = res;
+        setPostComments(data);
+      } catch (error) {
+        console.log(error.message);
+      }
+    };
+    fetchComments();
+  }, [postId, refreshComment]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -19,6 +37,7 @@ const CommentSection = ({ postId }) => {
         postId,
       });
       setComment("");
+      setrefreshComment(true);
     } catch (error) {
       if (error.response) {
         setcommentError(error.response.data.message);
@@ -26,6 +45,29 @@ const CommentSection = ({ postId }) => {
         setcommentError(error.message);
       }
     }
+  };
+
+  const handleLike = async (commentId) => {
+    try {
+      if (!currentUser) {
+        navigate("/sign-in");
+        return;
+      }
+      const res = await axios.put(`/api/comment/likecomment/${commentId}`);
+      const { data } = res;
+      setPostComments(
+        PostComments.map((likedcomment) =>
+          likedcomment._id === commentId
+            ? {
+                ...likedcomment,
+                likes: data.likes,
+                numberOfLikes: data.likes.length,
+              }
+            : likedcomment
+        )
+      );
+      console.log(data);
+    } catch (error) {}
   };
 
   return (
@@ -81,6 +123,65 @@ const CommentSection = ({ postId }) => {
             </Alert>
           )}
         </form>
+      )}
+      {PostComments.length === 0 ? (
+        <p className="text-sm my-5">No comments yet!</p>
+      ) : (
+        <>
+          <div className=" flex gap-2 items-center my-5 text-sm">
+            <p>Comments</p>
+            <div className="border border-gray-400 px-3 rounded-sm py-1">
+              <p className="">{PostComments.length}</p>
+            </div>
+          </div>
+          {PostComments.map((comment) => (
+            <div
+              className="flex gap-2 border-b p-4 dark:border-gray-600 "
+              key={comment._id}
+            >
+              <div className="flex-shrink-0 mr-1">
+                <img
+                  src={comment.userId.profilePicture}
+                  alt="image"
+                  className="h-10 w-10 rounded-full bg-gray-200"
+                />
+              </div>
+              <div className="flex-1">
+                <div className="">
+                  <span className="font-bold mr-3 text-xs truncate ">
+                    {comment.userId?.username ?? "Anonymous User"}
+                  </span>
+                  <span className="text-gray=500 text-xs">
+                    {moment(comment.createdAt).fromNow()}
+                  </span>
+                </div>
+                <p className="text-gray-500 pb-1 dark:text-gray-300">
+                  {comment.content}
+                </p>
+                <div className="flex text-xs items-center gap-2 border-t max-w-fit mt-2 pt-2 dark:border-gray-600 border-gray-300">
+                  <button
+                    onClick={() => handleLike(comment._id)}
+                    className={`text-gray-500 hover:text-blue-500
+                      ${
+                        currentUser &&
+                        comment.likes.includes(currentUser._id) &&
+                        "!text-blue-500"
+                      }`}
+                    type="button"
+                  >
+                    <FaThumbsUp className="text-sm" />
+                  </button>
+                  <p className="text-gray-500">
+                    {comment.numberOfLikes > 0 &&
+                      comment.numberOfLikes +
+                        " " +
+                        (comment.numberOfLikes === 1 ? "like" : "likes")}
+                  </p>
+                </div>
+              </div>
+            </div>
+          ))}
+        </>
       )}
     </div>
   );
