@@ -6,6 +6,7 @@ import { Link, useLocation } from "react-router-dom";
 import axios from 'axios';
 import { useDispatch, useSelector } from 'react-redux';
 import { clearUserSuccess } from "../redux/user/userSlice"; 
+import { LiaComments } from "react-icons/lia";
 
 const DashSidebar = () => {
     const location = useLocation();
@@ -47,6 +48,9 @@ const DashSidebar = () => {
              </Link>
              <Link to='/dashboard?tab=users'>  
              <Sidebar.Item as='div' active={tab==='users'} icon={HiUserGroup} >Users</Sidebar.Item>
+             </Link>
+             <Link to='/dashboard?tab=comments'>  
+             <Sidebar.Item as='div' active={tab==='comments'} icon={LiaComments} >Comments</Sidebar.Item>
              </Link>
              </>
              )}
