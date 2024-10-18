@@ -7,6 +7,7 @@ import axios from 'axios';
 import { useDispatch, useSelector } from 'react-redux';
 import { clearUserSuccess } from "../redux/user/userSlice"; 
 import { LiaComments } from "react-icons/lia";
+import { RiDashboardFill } from "react-icons/ri";
 
 const DashSidebar = () => {
     const location = useLocation();
@@ -34,6 +35,11 @@ const DashSidebar = () => {
     <Sidebar className='w-full md:w-56'>
         <Sidebar.Items>
             <Sidebar.ItemGroup className='flex flex-col gap-1'>
+            {currentUser?.isAdmin && (
+              <Link to='/dashboard?tab=dash'>  
+              <Sidebar.Item as='div'  active={tab==='dash'||!tab} icon={RiDashboardFill} >Dashboard</Sidebar.Item>
+              </Link>
+            )}
              <Link to='/dashboard?tab=profile'>  
              <Sidebar.Item as='div' active={tab==='profile'} icon={HiUser} label={currentUser.isAdmin? 'Admin' : 'User'} labelColor='dark'>
               Profile</Sidebar.Item>

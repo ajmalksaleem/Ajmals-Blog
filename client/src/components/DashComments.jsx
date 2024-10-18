@@ -32,7 +32,7 @@ const DashComments = () => {
     const startIndex = Comments.length;
     try {
       const res = await axios.get(
-        `/api/comment/getallcomments&startIndex=${startIndex}`
+        `/api/comment/getallcomments?startIndex=${startIndex}`
       );
       const { data } = res;
       setComments((prev) => [...prev, ...data.comments]);
