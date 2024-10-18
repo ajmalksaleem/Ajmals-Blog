@@ -6,6 +6,7 @@ import axios from "axios";
 import moment from "moment";
 import { FaThumbsUp } from "react-icons/fa";
 import { MdVerified } from "react-icons/md";
+import { HiOutlineExclamationCircle } from "react-icons/hi";
 
 const CommentSection = ({ postId }) => {
   const { currentUser } = useSelector((state) => state.user);
@@ -16,6 +17,7 @@ const CommentSection = ({ postId }) => {
   const [showModal, setShowModal] = useState(false);
   const [editValue, seteditValue] = useState('');
   const [editCommentId, seteditCommentId] = useState(null);
+  const [showdeleteModal, setshowdeleteModal] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -70,7 +72,6 @@ const CommentSection = ({ postId }) => {
             : likedcomment
         )
       );
-      console.log(data);
     } catch (error) {}
   };
   
@@ -104,6 +105,18 @@ const CommentSection = ({ postId }) => {
         } catch (error) {
           
         }
+    } catch (error) {
+      
+    }
+  };
+
+  const handleCommentDelete = async()=>{
+    try {
+      const res = await axios.delete(`/api/comment/deletecomment/${editCommentId}`)
+      const{data} = res;
+      setPostComments(PostComments.filter((comment) => comment._id !== data._id));
+      seteditCommentId('')
+      setshowdeleteModal(false)
     } catch (error) {
       
     }
@@ -223,6 +236,14 @@ const CommentSection = ({ postId }) => {
                       edit
                     </button>
                   )}
+                  {(comment.userId?._id === currentUser?._id || currentUser?.isAdmin) && (
+                    <button onClick={()=>{
+                    setshowdeleteModal(true)
+                    seteditCommentId(comment._id)
+                    }} className="hover:text-blue-500 text-gray-700 dark:text-gray-300 dark:hover:text-blue-500">
+                      Delete
+                    </button>
+                  )}
                 </div>
               </div>
             </div>
@@ -243,6 +264,19 @@ const CommentSection = ({ postId }) => {
                 <Button color='failure' onClick={()=>setShowModal(false)}>Cancel</Button>
                 <Button color='success'onClick={()=>editComment()}>Edit Comment</Button>
                 </div>
+                </div>
+              </Modal.Body>
+      </Modal>
+      <Modal show={showdeleteModal} onClose={()=>setshowdeleteModal(false)} popup size='md'>
+              <Modal.Header/>
+              <Modal.Body>
+                <div className="text-center">
+                  <HiOutlineExclamationCircle className="h-14 w-14 text-gray-400 dark:text-gray-200 mb-4 mx-auto"/>
+                  <h3 className="mb-5 text-lg text-gray-600">Are you sure that you want to delete this Comment?</h3>
+                </div>
+                <div className="flex justify-center gap-4">
+                  <Button color='success' onClick={()=>setshowdeleteModal(false)}>Cancel</Button>
+                  <Button color='failure' onClick={handleCommentDelete}>Yes, Delete</Button>
                 </div>
               </Modal.Body>
       </Modal>
