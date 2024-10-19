@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { About, Signin, Signup, Home, Dashboard, CreatePost, UpdatePost,PostPage } from "./pages/index.pages";
+import { About, Signin, Signup, Home, Dashboard, CreatePost, UpdatePost,PostPage, Search } from "./pages/index.pages";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import PrivateRoutes from "./components/privateRoutes";
@@ -15,6 +15,7 @@ const App = () => {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/about" element={<About />} />
+        <Route path="/search" element={<Search/>} />
         <Route path="/post/:postSlug" element={<PostPage/>} />
         <Route element={<PublicRoutes />}>
           <Route path="/sign-in" element={<Signin />} />

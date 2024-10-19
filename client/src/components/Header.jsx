@@ -1,26 +1,47 @@
 import { Avatar, Button, Dropdown, Navbar, TextInput } from "flowbite-react";
-import { Link,useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { AiOutlineSearch } from "react-icons/ai";
 import { FaMoon } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import { toggleTheme } from "../redux/theme/themeSlice";
 import { clearUserSuccess } from "../redux/user/userSlice";
 import axios from "axios";
+import { useEffect, useState } from "react";
 
 const header = () => {
-  const path = useLocation().pathname
-  const {currentUser} =  useSelector(state=>state.user)
- const dispatch = useDispatch() 
+  const path = useLocation().pathname;
+  const location = useLocation();
+  const navigate = useNavigate()
+  const dispatch = useDispatch();
+  const { currentUser } = useSelector((state) => state.user);
+  const [SearchTerm, setSearchTerm] = useState("");
 
- const handleSignout = async()=>{
-    try {
-      const res = await axios.post('/api/user/signout')
-      const {data} = res
-      dispatch(clearUserSuccess())
-    } catch (error) {
-      console.log(error)
+  useEffect(() => {
+    const UrlParams = new URLSearchParams(location.search)
+    const searchTermFromUrl = UrlParams.get('searchTerm')
+    if(searchTermFromUrl){
+      setSearchTerm(searchTermFromUrl)
     }
- }
+    
+  }, [location.search]);
+
+  const handleSubmit = async(e)=>{
+    e.preventDefault()
+    const UrlParams = new URLSearchParams(location.search)
+    UrlParams.set('searchTerm', SearchTerm)
+    const SearchQuery = UrlParams.toString()
+    navigate(`/search?${SearchQuery}`)
+  }
+
+  const handleSignout = async () => {
+    try {
+      const res = await axios.post("/api/user/signout");
+      const { data } = res;
+      dispatch(clearUserSuccess());
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   return (
     <Navbar className="border-b-2">
@@ -33,39 +54,46 @@ const header = () => {
         </span>{" "}
         Blog
       </Link>
-      <form>
+      <form onSubmit={handleSubmit}>
         <TextInput
           type="text"
           placeholder="search..."
           rightIcon={AiOutlineSearch}
           className="hidden lg:inline "
+          value={SearchTerm}
+          onChange={(e)=>setSearchTerm(e.target.value)}
         />
       </form>
       <Button className="w-12 h-10 lg:hidden aliign" color="gray" pill>
         <AiOutlineSearch className="mt-0.5" />
       </Button>
       <div className="flex gap-2 md:order-2">
-        <Button className="w-12 h-10 inline mr-2 focus:ring-0 " color="gray" pill onClick={()=>dispatch(toggleTheme())}>
-          <FaMoon/>
+        <Button
+          className="w-12 h-10 inline mr-2 focus:ring-0 "
+          color="gray"
+          pill
+          onClick={() => dispatch(toggleTheme())}
+        >
+          <FaMoon />
         </Button>
-        {currentUser? (
+        {currentUser ? (
           <Dropdown
-          arrowIcon={false}
-          inline
-          label={
-            <Avatar
-            alt="user"
-            img = {currentUser.profilePicture}
-            rounded/>
-          }>
+            arrowIcon={false}
+            inline
+            label={
+              <Avatar alt="user" img={currentUser.profilePicture} rounded />
+            }
+          >
             <Dropdown.Header>
               <span className="block text-sm">{currentUser.username}</span>
-              <span className="block text-sm font-medium truncate">{currentUser.email}</span>
+              <span className="block text-sm font-medium truncate">
+                {currentUser.email}
+              </span>
             </Dropdown.Header>
-            <Link to={'/dashboard?tab=profile'}>
-            <Dropdown.Item>Profile</Dropdown.Item>
+            <Link to={"/dashboard?tab=profile"}>
+              <Dropdown.Item>Profile</Dropdown.Item>
             </Link>
-            <Dropdown.Divider/>
+            <Dropdown.Divider />
             <Dropdown.Item onClick={handleSignout}>SignOut</Dropdown.Item>
           </Dropdown>
         ) : (
@@ -74,17 +102,17 @@ const header = () => {
               Sign In
             </Button>
           </Link>
-        ) }
-        <Navbar.Toggle/>
+        )}
+        <Navbar.Toggle />
       </div>
       <Navbar.Collapse>
-        <Navbar.Link as={Link}  active={path=== "/"} to='/'>
+        <Navbar.Link as={Link} active={path === "/"} to="/">
           Home
         </Navbar.Link>
-        <Navbar.Link as={Link} active={path=== "/projects"} to='/projects'>
-         Projects
+        <Navbar.Link as={Link} active={path === "/projects"} to="/projects">
+          Projects
         </Navbar.Link>
-        <Navbar.Link as={Link} active={path=== "/about"} to='/about'>
+        <Navbar.Link as={Link} active={path === "/about"} to="/about">
           About
         </Navbar.Link>
       </Navbar.Collapse>
