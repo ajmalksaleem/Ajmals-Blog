@@ -10,6 +10,7 @@ import { useForm } from "react-hook-form";
 import axios from "axios";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import carBodyTypes from "../assets/Data";
 
 const CreatePost = () => {
   const [file, SetFile] = useState(null);
@@ -95,11 +96,9 @@ const CreatePost = () => {
         )}
           <Select {...register("category")}>
             <option value="uncategorized">Select a category</option>
-            <option value="javascript">JavaScript</option>
-            <option value="react">React</option>
-            <option value="mongodb">mongodb</option>
-            <option value="nodejs">Nodejs</option>
-            <option value="css">css</option>
+            {carBodyTypes.map((bdtype)=>(
+            <option key={bdtype.id} value={bdtype.type}>{bdtype.type}</option>
+            ))}
           </Select>
         </div>
         <div className="flex gap-4 items-center justify-between border-4 border-teal-500 border-dotted p-3">

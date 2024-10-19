@@ -3,6 +3,7 @@ import { Button, Select, Spinner, TextInput } from "flowbite-react";
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import PostCard from '../components/PostCard'
+import carBodyTypes from "../assets/Data";
 
 const Search = () => {
   const [posts, setPosts] = useState([]);
@@ -10,7 +11,7 @@ const Search = () => {
   const [showMore, setShowMore] = useState(false);
   const [SidebarData, setSidebarData] = useState({
     searchTerm: "",
-    category: "uncategorized",
+    category: 'all',
     sort: "desc",
   });
   const location = useLocation();
@@ -49,6 +50,19 @@ const Search = () => {
     fetchPosts();
   }, [location.search]);
 
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const urlParams = new URLSearchParams(location.search);
+    urlParams.set('searchTerm', SidebarData.searchTerm);
+    urlParams.set('sort', SidebarData.sort);
+    if(SidebarData.category){
+        urlParams.set('category', SidebarData.category);
+    }
+    const searchQuery = urlParams.toString();
+    navigate(`/search?${searchQuery}`);
+  }
+
   const handleShowMore = async () => {
     const startIndex =  posts.length;;
     const urlParams = new URLSearchParams(location.search);
@@ -64,16 +78,6 @@ const Search = () => {
       }
     
   };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    const urlParams = new URLSearchParams(location.search);
-    urlParams.set('searchTerm', SidebarData.searchTerm);
-    urlParams.set('sort', SidebarData.sort);
-    urlParams.set('category', SidebarData.category);
-    const searchQuery = urlParams.toString();
-    navigate(`/search?${searchQuery}`);
-  }
 
   return (
     <div className="flex flex-col md:flex-row">
@@ -111,9 +115,11 @@ const Search = () => {
                 setSidebarData({ ...SidebarData, category: e.target.value })
               }
             >
+                <option value="all">All category</option>
               <option value="uncategorized">uncategorized</option>
-              <option value="javascript">javascript</option>
-              <option value="react">react</option>
+              {carBodyTypes.map((bdtype)=>(
+            <option key={bdtype.id} value={bdtype.type}>{bdtype.type}</option>
+            ))}
             </Select>
           </div>
           <Button type="submit" gradientDuoTone="purpleToBlue" outline>
@@ -129,7 +135,7 @@ const Search = () => {
       ) : (
         <>
         <h1 className="text-3xl font-semibold sm:border-b border-gray-500 p-3 mt-5">Post Results :</h1>
-        <div className='p-7 flex flex-wrap gap-4'>
+        <div className='p-7 flex flex-wrap gap-6 sm:ml-10 mt-10'>
           {!loading && posts.length === 0 && (
             <p className='text-xl text-gray-500'>No posts found.</p>
           )}

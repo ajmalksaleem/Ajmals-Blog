@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import axios from 'axios'
 import { useState } from "react";
+import Oauth from "../components/Oauth";
 
 const signup = () => {
   const [Loading , setLoading] = useState(false)
@@ -35,15 +36,15 @@ const signup = () => {
         <div className="flex-1">
           <Link to="/" className="font-bold dark:text-white text-4xl ">
             <span className="px-2 py-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-lg text-white">
-              Ajmal's
+            Turbo
             </span>{" "}
-            Blog
+            Tribune
           </Link>
           <p className="text-sm mt-5">
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Incidunt ex
-            corrupti qui aut necessitatibus accusantium eligendi. Sapiente
-            assumenda ut delectus, qui minima similique quibusdam laudantium. Et
-            eaque voluptatibus error ea!
+          Your destination for automotive insights and news. Industry trends,
+            model releases, and technological advancements at your fingertips.
+            Engage with expert opinions, in-depth features, and real-time
+            updates.
           </p>
         </div>
         {/* Right-Side */}
@@ -124,6 +125,7 @@ const signup = () => {
             <Button gradientDuoTone="purpleToPink" type="submit" disabled={Loading}>
             {Loading? "Loading.." : ' Sign Up'}
             </Button>
+            <Oauth/>
           </form>
           <div className="flex mt-5 gap-2">
             <span>Have an account?</span>

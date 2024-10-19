@@ -3,7 +3,7 @@ import { Navigate, Outlet } from "react-router-dom"
 
 const PublicRoutes = () => {
     const {currentUser} = useSelector(state=>state.user)
-  return !currentUser ? <Outlet/> : <Navigate to={'/dashboard?tab=profile'}/>  
+  return !currentUser ? <Outlet/> : <Navigate to={'/'}/>  
 }
 
 export default PublicRoutes

@@ -6,6 +6,7 @@ import PrivateRoutes from "./components/privateRoutes";
 import PublicRoutes from "./components/PublicRoutes";
 import AdminRoutes from "./components/AdminRoutes";
 import ScrolltoTop from "./components/ScrolltoTop";
+import Margin from "./components/Margin";
 
 const App = () => {
   return (
@@ -13,6 +14,7 @@ const App = () => {
     <ScrolltoTop/>
       <Header/>
       <Routes>
+        <Route element={<Margin />}>
         <Route path="/" element={<Home />} />
         <Route path="/about" element={<About />} />
         <Route path="/search" element={<Search/>} />
@@ -27,6 +29,7 @@ const App = () => {
             <Route path="/update-post/:postId" element={<UpdatePost/>} />
             <Route path="/createpost" element={<CreatePost/>} />
           </Route>
+        </Route>
         </Route>
       </Routes>
       <Footer />

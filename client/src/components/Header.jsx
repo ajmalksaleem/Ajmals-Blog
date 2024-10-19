@@ -1,12 +1,13 @@
 import { Avatar, Button, Dropdown, Navbar, TextInput } from "flowbite-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { AiOutlineSearch } from "react-icons/ai";
-import { FaMoon } from "react-icons/fa";
+import { FaMoon} from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import { toggleTheme } from "../redux/theme/themeSlice";
 import { clearUserSuccess } from "../redux/user/userSlice";
 import axios from "axios";
 import { useEffect, useState } from "react";
+import { IoSunny } from "react-icons/io5";
 
 const header = () => {
   const path = useLocation().pathname;
@@ -14,6 +15,7 @@ const header = () => {
   const navigate = useNavigate()
   const dispatch = useDispatch();
   const { currentUser } = useSelector((state) => state.user);
+  const { theme } = useSelector((state) => state.theme);
   const [SearchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
@@ -44,15 +46,15 @@ const header = () => {
   };
 
   return (
-    <Navbar className="border-b-2">
+    <Navbar className="border-b-2 fixed w-full z-50">
       <Link
         to="/"
         className="self-center whitespace-nowrap text-sm sm:text-xl font-semibold dark:text-white"
       >
         <span className="px-2 py-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-lg text-white">
-          Ajmal's
+        Turbo
         </span>{" "}
-        Blog
+        Tribune
       </Link>
       <form onSubmit={handleSubmit}>
         <TextInput
@@ -64,17 +66,17 @@ const header = () => {
           onChange={(e)=>setSearchTerm(e.target.value)}
         />
       </form>
-      <Button className="w-12 h-10 lg:hidden aliign" color="gray" pill>
-        <AiOutlineSearch className="mt-0.5" />
+      <Button className="w-12 h-10 lg:hidden aliign" color="gray" pill onClick={()=>navigate('/search')}>
+        <AiOutlineSearch className="mt-0.5 " />
       </Button>
       <div className="flex gap-2 md:order-2">
         <Button
-          className="w-12 h-10 inline mr-2 focus:ring-0 "
+          className="inline mr-2 focus:ring-0 "
           color="gray"
           pill
           onClick={() => dispatch(toggleTheme())}
         >
-          <FaMoon />
+          {theme === 'dark' ? <IoSunny/> : <FaMoon />}
         </Button>
         {currentUser ? (
           <Dropdown
@@ -108,9 +110,6 @@ const header = () => {
       <Navbar.Collapse>
         <Navbar.Link as={Link} active={path === "/"} to="/">
           Home
-        </Navbar.Link>
-        <Navbar.Link as={Link} active={path === "/projects"} to="/projects">
-          Projects
         </Navbar.Link>
         <Navbar.Link as={Link} active={path === "/about"} to="/about">
           About
