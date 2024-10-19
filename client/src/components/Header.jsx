@@ -46,7 +46,7 @@ const header = () => {
   };
 
   return (
-    <Navbar className="border-b-2 fixed w-full z-50">
+    <Navbar className="border-b-2 fixed w-full h-16 z-50">
       <Link
         to="/"
         className="self-center whitespace-nowrap text-sm sm:text-xl font-semibold dark:text-white"
