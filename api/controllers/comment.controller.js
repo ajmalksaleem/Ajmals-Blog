@@ -64,8 +64,6 @@ export const editComments = async(req,res,next)=>{
               errorHandler(403, 'You are not allowed to edit this comment')
             );
           }
-          console.log(comment.userId)
-          console.log(req.user.id)
           const editedComment = await Comment.findByIdAndUpdate(req.params.commentId,{
             content : req.body.content
           },{new:true})
