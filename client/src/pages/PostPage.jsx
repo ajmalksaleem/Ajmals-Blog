@@ -75,9 +75,9 @@ const PostPage = () => {
         dangerouslySetInnerHTML={{ __html: post?.content }}
       ></div>
       <CommentSection postId={post._id} />
-      <div className="flex flex-col justify-center items-center mb-5">
+      <div className="flex flex-col justify-center items-center mb-5 ">
         <h1 className="text-xl my-5">Recent Articles</h1>
-        <div className="flex gap-4 flex-wrap justify-center">
+        <div className="flex gap-7 flex-wrap justify-center">
           {RecentPosts &&
             RecentPosts.map((post) => <PostCard key={post._id} post={post} />)}
         </div>

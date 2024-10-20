@@ -215,7 +215,7 @@ const CommentSection = ({ postId }) => {
                 <div className="flex text-xs items-center gap-2 border-t max-w-fit mt-2 pt-2 dark:border-gray-600 border-gray-300">
                   <button
                     onClick={() => handleLike(comment._id)}
-                    className={`text-gray-500 hover:text-blue-500
+                    className={`text-gray-500 md:hover:text-blue-500
                       ${
                         currentUser &&
                         comment.likes.includes(currentUser._id) &&
