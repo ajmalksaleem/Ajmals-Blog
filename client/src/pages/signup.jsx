@@ -120,6 +120,10 @@ const signup = () => {
                     value: 5,
                     message: "username must be more than 5 characters",
                   },
+                  maxLength: {
+                    value: 20,
+                    message: "username cannot exceed 20 characters",
+                  },
                 })}
               />
               {errors.username && (

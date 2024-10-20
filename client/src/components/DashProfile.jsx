@@ -10,7 +10,7 @@ import {
   ref,
   uploadBytesResumable,
 } from "firebase/storage";
-import { useForm } from "react-hook-form";
+import { useForm , useWatch} from "react-hook-form";
 import axios from "axios";
 import {
   signInStart,
@@ -21,6 +21,8 @@ import {
   clearUserSuccess,
 } from "../redux/user/userSlice";
 import { HiOutlineExclamationCircle } from "react-icons/hi";
+import { FaCameraRetro } from "react-icons/fa";
+import toast from "react-hot-toast";
 
 const DashProfile = () => {
   const { currentUser, error, loading } = useSelector((state) => state.user);
@@ -28,6 +30,8 @@ const DashProfile = () => {
   const [filePercentage, setfilePercentage] = useState(null);
   const [fileUploadError, setfileUploadError] = useState(false);
   const [profilePicture, setprofilePicture] = useState(null);
+  const [DupeUsernameError, setDupeUsernameError] = useState(null);
+  const [DupeemailError, setDupeemailError] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const filepickRef = useRef();
 
@@ -35,6 +39,7 @@ const DashProfile = () => {
     register,
     reset,
     handleSubmit,
+    control,
     formState: { errors, dirtyFields },
   } = useForm({ mode: "onChange", defaultValues: { ...currentUser } });
 
@@ -96,6 +101,8 @@ const DashProfile = () => {
     }
     reset({}, { keepValues: true });
     if (Object.keys(updatedValues).length === 0) return;
+    toast.dismiss();
+    if(DupeUsernameError || DupeemailError) return
     try {
       dispatch(signInStart());
       const res = await axios.put(`/api/user/update/${currentUser._id}`, {
@@ -103,15 +110,18 @@ const DashProfile = () => {
       });
       const data = res.data;
       dispatch(signInSuccess(data));
+      toast.success("Profile Updated");
     } catch (error) {
       if (error.response) {
-        if(error.response.data.message === 'NoToken'){
-          dispatch(clearUserSuccess())
-          return
+        if (error.response.data.message === "NoToken") {
+          dispatch(clearUserSuccess());
+          return;
         }
         dispatch(signInFailure(error.response.data.message));
+        toast.error(error.response.data.message);
       } else {
         dispatch(signInFailure(error.message));
+        toast.error(error.message);
       }
     }
   };
@@ -131,6 +141,41 @@ const DashProfile = () => {
       }
     }
   };
+
+  const username = useWatch({
+    name: 'username',
+    control
+  });
+  const email = useWatch({
+    name: 'email',
+    control
+  });
+
+useEffect(() => {
+  const checkDuplicates = async () => {
+    setDupeUsernameError(null);
+    setDupeemailError(null);
+    if(!username && !password) return
+    try {
+     const res = await axios.post("/api/user/checkupdateduplicate", {
+        username,email
+      });
+      const{data}=res
+      console.log(data)
+    } catch (error) {
+      if (error.response && error.response.data.message) {
+        if (error.response.data.message === "Email-exists") {
+          setDupeemailError("Email Id already exist");
+        } else if (error.response.data.message === "Username-exists") {
+          setDupeUsernameError("Username already exist");
+        }
+      }
+    }
+  };
+  
+    checkDuplicates();
+
+}, [username,email]);
 
   return (
     <div className="mx-auto max-w-lg w-full p-3 ">
@@ -176,6 +221,9 @@ const DashProfile = () => {
               ${filePercentage && filePercentage < 100 && "opacity-60"}
               `}
           />
+          <div className="absolute inset-0 mt-20 sm:mt-0  sm:h-full rounded-full rounded-t-none sm:pt-3 opacity-100 sm:opacity-0 transition-opacity duration-300 bg-black bg-opacity-50 sm:hover:opacity-100">
+            <FaCameraRetro className="w-4 h-4 sm:w-6 sm:h-6 text-white mx-auto mt-2.5 sm:my-9 " />
+          </div>
         </div>
         {fileUploadError && (
           <Alert color="failure">
@@ -205,11 +253,22 @@ const DashProfile = () => {
                 );
               },
             },
+            minLength: {
+              value: 5,
+              message: "username must be more than 5 characters",
+            },
+            maxLength: {
+              value: 20,
+              message: "username cannot exceed 20 characters",
+            },
           })}
         />
         {errors.username && (
           <p className="text-sm mt-2 text-red-500">{errors.username.message}</p>
         )}
+        {DupeUsernameError && (
+                <p className="text-sm mt-2 text-red-500">{DupeUsernameError}</p>
+              )}
         <Label value="Your email" />
         <TextInput
           type="email"
@@ -225,11 +284,26 @@ const DashProfile = () => {
         {errors.email && (
           <p className="text-sm mt-2 text-red-500">{errors.email?.message}</p>
         )}
+        {DupeemailError && (
+                <p className="text-sm mt-2 text-red-500">{DupeemailError}</p>
+              )}
         <Label value="Your paswword" />
         <TextInput
           type="password"
           placeholder="Password"
           {...register("password", {
+            validate: {
+              noSpaces: (value) => {
+                if (!value) return true;
+                const trimmedValue = value.trim();
+                return (
+                  (trimmedValue !== "" &&
+                    trimmedValue === value &&
+                    !trimmedValue.includes(" ")) ||
+                  "Password cannot contain spaces"
+                );
+              },
+            },
             minLength: {
               value: 4,
               message: "Password must be more than 4 characters",
@@ -241,8 +315,17 @@ const DashProfile = () => {
             {errors.password?.message}
           </p>
         )}
-        <Button type="submit" gradientDuoTone="purpleToBlue" className="mt-4">
-          Update
+        <Button
+          type="submit"
+          disabled={loading || filePercentage}
+          gradientDuoTone="purpleToBlue"
+          className="mt-4"
+        >
+          {loading
+            ? "loading..."
+            : filePercentage
+            ? "Image Uploading..."
+            : "Update"}
         </Button>
         <Button
           gradientDuoTone="pinkToOrange"
