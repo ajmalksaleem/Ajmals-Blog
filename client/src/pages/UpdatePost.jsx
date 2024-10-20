@@ -7,8 +7,9 @@ import { app } from "../firebase";
 import { CircularProgressbar } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
 import axios from "axios";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate,useParams } from "react-router-dom";
+import { clearUserSuccess } from "../redux/user/userSlice";
 
 const UpdatePost = () => {
   const [file, setFile] = useState(null);
@@ -20,6 +21,7 @@ const UpdatePost = () => {
   const {currentUser} = useSelector(state=>state.user)
   const navigate = useNavigate()
   const { postId } = useParams();
+  const dispatch = useDispatch()
 
   useEffect(() => {
     const fetchPost = async() => {
@@ -90,6 +92,10 @@ const UpdatePost = () => {
             navigate(`/post/${data.slug}`)
         } catch(error) {
             if(error.response){
+              if(error.response.data.message === 'NoToken'){
+                dispatch(clearUserSuccess())
+                return
+              }
                 setpublishError(error.response.data.message)
                }else{
                 setpublishError(error.message)
@@ -109,8 +115,8 @@ const UpdatePost = () => {
             required
             id='title'
             className="flex-1"
+            value={formData.title !== undefined ? formData.title : postdata?.title}
             onChange={(e)=>setFormdata({...formData,title:e.target.value})}
-            value={postdata?.title }
           />
           <Select
           value={postdata.category}

@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Button, Modal, Table } from "flowbite-react";
 import moment from "moment";
 import { Link } from "react-router-dom";
 import {HiOutlineExclamationCircle} from 'react-icons/hi'
+import { clearUserSuccess } from "../redux/user/userSlice";
 
 const DashPosts = () => {
   const [Userposts, setUserPosts] = useState([]);
@@ -12,6 +13,7 @@ const DashPosts = () => {
   const [showModal, setShowModal] = useState(false)
   const [deletePostId, setDeletePostId] = useState(null)
   const { currentUser } = useSelector((state) => state.user);
+  const dispatch = useDispatch()
 
   useEffect(() => {
     const fetchPost = async () => {
@@ -49,6 +51,10 @@ const DashPosts = () => {
         await axios.delete(`/api/post/deletepost/${deletePostId}/${currentUser._id}`)
         setUserPosts(prev=>prev.filter((post)=>post._id != deletePostId))
       } catch (error) {
+        if(error.response.data.message === 'NoToken'){
+          dispatch(clearUserSuccess())
+          return
+        }
         console.log(error.message)
       }
   }

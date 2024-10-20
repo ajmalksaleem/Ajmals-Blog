@@ -8,9 +8,10 @@ import { CircularProgressbar } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
 import { useForm } from "react-hook-form";
 import axios from "axios";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import carBodyTypes from "../assets/Data";
+import { clearUserSuccess } from "../redux/user/userSlice";
 
 const CreatePost = () => {
   const [file, SetFile] = useState(null);
@@ -23,6 +24,7 @@ const CreatePost = () => {
   const { register, handleSubmit, formState: {errors}} = useForm({ mode: "onChange" });
   const {currentUser} = useSelector(state=>state.user)
   const navigate = useNavigate()
+  const dispatch = useDispatch()
 
   const handleImageupload = async () => {
     try {
@@ -71,6 +73,10 @@ const CreatePost = () => {
             navigate(`/post/${data.slug}`)
         } catch(error) {
             if(error.response){
+              if(error.response.data.message === 'NoToken'){
+                dispatch(clearUserSuccess())
+                return
+              }
                 setpublishError(error.response.data.message)
                }else{
                 setpublishError(error.message)

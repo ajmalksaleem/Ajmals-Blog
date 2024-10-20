@@ -5,9 +5,9 @@ import { CreatePost, getPosts, DeletePost, UpdatePost } from '../controllers/pos
 
 const router = Router()
 
-router.post('/create', verifyUser, CreatePost)
+router.post('/create', verifyUser, CreatePost) 
+router.delete('/deletepost/:postId/:userId',verifyUser, DeletePost) 
+router.put('/updatepost/:postId/:userId',verifyUser, UpdatePost) 
 router.get ('/getPosts', getPosts)
-router.delete('/deletepost/:postId/:userId',verifyUser, DeletePost)
-router.put('/updatepost/:postId/:userId',verifyUser, UpdatePost)
 
 export default router;

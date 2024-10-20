@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Button, Modal, Table } from "flowbite-react";
 import moment from "moment";
 import { HiOutlineExclamationCircle } from "react-icons/hi";
+import { clearUserSuccess } from "../redux/user/userSlice";
 
 const DashComments = () => {
   const [Comments, setComments] = useState([]);
@@ -11,6 +12,7 @@ const DashComments = () => {
   const [showModal, setShowModal] = useState(false);
   const [DeleteCommentId, setDeleteCommentId] = useState(null);
   const { currentUser } = useSelector((state) => state.user);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     const fetchComments = async () => {
@@ -20,6 +22,10 @@ const DashComments = () => {
         setComments(data.comments);
         if (data.comments.length < 9) setShowMore(false);
       } catch (error) {
+        if(error.response.data.message === 'NoToken'){
+          dispatch(clearUserSuccess())
+          return
+        }
         console.log(error.message);
       }
     };
@@ -39,6 +45,10 @@ const DashComments = () => {
       if (data?.comments?.length < 9) setShowMore(false);
     } catch (error) {
       if (error.response) {
+        if(error.response.data.message === 'NoToken'){
+          dispatch(clearUserSuccess())
+          return
+        }
         console.log(error.response.data.message);
       } else {
         console.log(error.message);
@@ -54,6 +64,10 @@ const DashComments = () => {
         prev.filter((comment) => comment._id != DeleteCommentId)
       );
     } catch (error) {
+      if(error.response.data.message === 'NoToken'){
+        dispatch(clearUserSuccess())
+        return
+      }
       console.log(error.message);
     }
   };

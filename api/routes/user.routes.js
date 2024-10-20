@@ -4,10 +4,10 @@ import { verifyUser } from "../utils/verifyUser.js";
 
 const router =Router()
 
-router.put('/update/:userId', verifyUser, UpdateUser)
-router.delete('/delete/:userId', verifyUser, DeleteUser)
+router.put('/update/:userId', verifyUser, UpdateUser) //
+router.delete('/delete/:userId', verifyUser, DeleteUser) //
+router.get('/getusers', verifyUser, GetUsers) //
 router.post('/signout', SignOut)
-router.get('/getusers', verifyUser, GetUsers)
 router.post('/checkduplicate',  CheckDuplicate)
 
 export default router;

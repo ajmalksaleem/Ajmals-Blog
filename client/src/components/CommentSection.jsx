@@ -1,12 +1,13 @@
 import { Alert, Button, Modal, Textarea } from "flowbite-react";
 import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import moment from "moment";
 import { FaThumbsUp } from "react-icons/fa";
 import { MdVerified } from "react-icons/md";
 import { HiOutlineExclamationCircle } from "react-icons/hi";
+import { clearUserSuccess } from "../redux/user/userSlice";
 
 const CommentSection = ({ postId }) => {
   const { currentUser } = useSelector((state) => state.user);
@@ -19,6 +20,7 @@ const CommentSection = ({ postId }) => {
   const [editCommentId, seteditCommentId] = useState(null);
   const [showdeleteModal, setshowdeleteModal] = useState(false);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   useEffect(() => {
     const fetchComments = async () => {
@@ -43,9 +45,13 @@ const CommentSection = ({ postId }) => {
         postId,
       });
       setComment("");
-      setrefreshComment(true);
+      setrefreshComment((prevrefreshComment) => !prevrefreshComment);;
     } catch (error) {
       if (error.response) {
+        if(error.response.data.message === 'NoToken'){
+          dispatch(clearUserSuccess())
+          return
+        }
         setcommentError(error.response.data.message);
       } else {
         setcommentError(error.message);
@@ -72,7 +78,13 @@ const CommentSection = ({ postId }) => {
             : likedcomment
         )
       );
-    } catch (error) {}
+    } catch (error) {
+      if(error.response.data.message === 'NoToken'){
+        dispatch(clearUserSuccess())
+        navigate('/sign-in')
+        return
+      }
+    }
   };
   
   const handlecommentEdit = (commentId,commentcontent)=>{
@@ -103,7 +115,11 @@ const CommentSection = ({ postId }) => {
           seteditValue('')
           seteditCommentId(null)
         } catch (error) {
-          
+          if(error.response.data.message === 'NoToken'){
+            dispatch(clearUserSuccess())
+            navigate('/sign-in')
+            return
+          }
         }
     } catch (error) {
       
@@ -118,7 +134,11 @@ const CommentSection = ({ postId }) => {
       seteditCommentId('')
       setshowdeleteModal(false)
     } catch (error) {
-      
+      if(error.response.data.message === 'NoToken'){
+        dispatch(clearUserSuccess())
+        navigate('/sign-in')
+        return
+      }
     }
   }
 

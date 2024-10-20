@@ -105,6 +105,10 @@ const DashProfile = () => {
       dispatch(signInSuccess(data));
     } catch (error) {
       if (error.response) {
+        if(error.response.data.message === 'NoToken'){
+          dispatch(clearUserSuccess())
+          return
+        }
         dispatch(signInFailure(error.response.data.message));
       } else {
         dispatch(signInFailure(error.message));

@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Button, Modal, Table } from "flowbite-react";
 import moment from "moment";
 import {HiOutlineExclamationCircle} from 'react-icons/hi'
 import { FaTimes, FaCheck } from "react-icons/fa";
+import { clearUserSuccess } from "../redux/user/userSlice";
 
 const DashUsers = () => {
   const [Users, setUsers] = useState([]);
@@ -12,6 +13,7 @@ const DashUsers = () => {
   const [showModal, setShowModal] = useState(false)
   const [deleteUserId, setDeleteUserId] = useState(null)
   const { currentUser } = useSelector((state) => state.user);
+  const dispatch = useDispatch()
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -23,7 +25,10 @@ const DashUsers = () => {
         setUsers(data.users);
         if (data.users.length < 9) setShowMore(false);
       } catch (error) {
-        console.log(error.message)
+        if(error.response.data.message === 'NoToken'){
+          dispatch(clearUserSuccess())
+          return
+        }
       }
     };
     if (currentUser.isAdmin) {
@@ -55,6 +60,10 @@ const DashUsers = () => {
         await axios.delete(`/api/user/delete/${deleteUserId}`)
         setUsers(prev=>prev.filter((user)=>user._id != deleteUserId))
       } catch (error) {
+        if(error.response.data.message === 'NoToken'){
+          dispatch(clearUserSuccess())
+          return
+        }
         console.log(error.message)
       }
   }
