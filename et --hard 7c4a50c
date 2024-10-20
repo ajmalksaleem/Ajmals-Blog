@@ -1,0 +1,53 @@
+[33mac1313f[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m)[m HEAD@{0}: checkout: moving from ac1313fa3d132d3b337cc8f8ffa7183816e6d090 to main
+[33mac1313f[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m)[m HEAD@{1}: checkout: moving from main to ac1313fa3d132d3b337cc8f8ffa7183816e6d090
+[33mac1313f[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m)[m HEAD@{2}: pull origin main: Fast-forward
+[33m7c4a50c[m HEAD@{3}: checkout: moving from main to main
+[33m7c4a50c[m HEAD@{4}: reset: moving to 7c4a50c18e95500b5a2cc9e838eeff681c8b2e3c
+[33mac1313f[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m)[m HEAD@{5}: commit (merge): Merge branch 'main' of https://github.com/ajmalksaleem/Ajmals-Blog
+[33m91011d3[m HEAD@{6}: commit: changed profile
+[33m7c4a50c[m HEAD@{7}: reset: moving to 7c4a50c18e95500b5a2cc9e838eeff681c8b2e3c
+[33m6ed91cf[m HEAD@{8}: commit: header solved
+[33mef47e7c[m HEAD@{9}: commit: hh
+[33m9ebdffd[m HEAD@{10}: commit: hh
+[33m27003a8[m HEAD@{11}: commit: header changes 2
+[33m726e75f[m HEAD@{12}: commit: header changes
+[33m7c4a50c[m HEAD@{13}: commit: post page problem resolved
+[33m3fa1c66[m HEAD@{14}: commit: edit comment problem for non admin users resolved
+[33mdc28e23[m HEAD@{15}: commit: change 2
+[33m0a73225[m HEAD@{16}: commit: change 1
+[33m1a7c640[m HEAD@{17}: commit: added favicon
+[33m29b6627[m HEAD@{18}: commit: added pre installation for deployment
+[33m4e07fa8[m HEAD@{19}: commit: before deployment
+[33m33ccb98[m HEAD@{20}: commit: complete search functionality
+[33meb0a1a4[m HEAD@{21}: commit: home page completed
+[33m6d8da36[m HEAD@{22}: commit: comment section on dashboard
+[33m8e33695[m HEAD@{23}: commit: completed recent posts
+[33m07cb9ae[m HEAD@{24}: commit: edit comment completed
+[33m2d801cb[m HEAD@{25}: commit: like functionality
+[33ma5847ee[m HEAD@{26}: commit: create comment section
+[33mf969144[m HEAD@{27}: commit: user delete for admin
+[33mc3b334a[m HEAD@{28}: commit: show users in dashboard completed
+[33mf000071[m HEAD@{29}: commit: api of getusers completed
+[33m891d9fb[m HEAD@{30}: commit: update post functionality completed
+[33m796538d[m HEAD@{31}: commit: add show more functionality
+[33md5079f0[m HEAD@{32}: commit: getPost Api route created
+[33m6c9f85f[m HEAD@{33}: commit: create-post complted
+[33mac96fea[m HEAD@{34}: commit: upload post image functionality
+[33mc2598fa[m HEAD@{35}: commit: createpost ui
+[33m8dc0579[m HEAD@{36}: commit: add admin functionality
+[33m6ae9ae2[m HEAD@{37}: commit: completed signout functionality
+[33mcecc90f[m HEAD@{38}: commit: user account delete
+[33mc334fdd[m HEAD@{39}: commit: update profile
+[33ma5cab63[m HEAD@{40}: commit: photoUpload
+[33ma43584d[m HEAD@{41}: commit: profile
+[33mb274714[m HEAD@{42}: commit: sidebar
+[33m68e579b[m HEAD@{43}: commit: theme
+[33m9e73639[m HEAD@{44}: commit: google auth
+[33m963d0a6[m HEAD@{45}: commit: signin completed
+[33m9e3c8b8[m HEAD@{46}: commit: signup section
+[33m12ec0b0[m HEAD@{47}: commit: created signup page ui
+[33mc8f9bef[m HEAD@{48}: commit: created signup route
+[33m3a341f8[m HEAD@{49}: commit: created and run the server
+[33mfc1083f[m HEAD@{50}: commit: created the header section
+[33m338e3be[m HEAD@{51}: Branch: renamed refs/heads/master to refs/heads/main
+[33m338e3be[m HEAD@{53}: commit (initial): version 1

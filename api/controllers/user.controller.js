@@ -95,3 +95,27 @@ export const GetUsers = async(req,res,next)=>{
     next(error)
   }
 }
+
+export const CheckDuplicate = async (req, res, next) => {
+  try {
+    const username = req.body?.username;
+  const email = req.body?.email;
+
+  if (username) {
+    const findUserByUsername = await User.findOne({ username });
+    if (findUserByUsername) {
+      return next(errorHandler(400, "Username-exists"));
+    }
+  }
+
+  if (email) {
+    const findUserByEmail = await User.findOne({ email });
+    if (findUserByEmail) {
+      return next(errorHandler(400, "Email-exists"));
+    }
+  }
+  res.status(200).json('no duplicates')
+  } catch (error) {
+    next(error)
+  }
+};

@@ -1,33 +1,71 @@
 import { Button, Label, TextInput } from "flowbite-react";
 import { Link, useNavigate } from "react-router-dom";
-import { useForm } from "react-hook-form";
-import axios from 'axios'
-import { useState } from "react";
+import { useForm, useWatch } from "react-hook-form";
+import axios from "axios";
+import { useEffect, useState } from "react";
 import Oauth from "../components/Oauth";
 
 const signup = () => {
-  const [Loading , setLoading] = useState(false)
-  const navigate = useNavigate()
+  const [Loading, setLoading] = useState(false);
+  const [DupeUsernameError, setDupeUsernameError] = useState(null);
+  const [DupeemailError, setDupeemailError] = useState(null);
+  const navigate = useNavigate();
   const {
     register,
     handleSubmit,
+    control,
     formState: { errors },
   } = useForm({ mode: "onChange" });
 
-
   const onSubmit = async (formData) => {
+    if(DupeUsernameError || DupeemailError) return
     try {
-      setLoading(true)
-      const res = await axios.post('/api/auth/sign-up',{
-        ...formData
-      })
-      const data = res.data
-      setLoading(false)
-      navigate('/sign-in')
-    } catch (error) {
-      
-    }
+      setLoading(true);
+      const res = await axios.post("/api/auth/sign-up", {
+        ...formData,
+      });
+      const data = res.data;
+      setLoading(false);
+      navigate("/sign-in");
+    } catch (error) {}
   };
+
+  const username = useWatch({
+    name: 'username',
+    control: control // from useForm
+  });
+  const email = useWatch({
+    name: 'email',
+    control: control // from useForm
+  });
+
+
+  useEffect(() => {
+    const checkDuplicates = async () => {
+      setDupeUsernameError(null);
+      setDupeemailError(null);
+      try {
+        console.log(username)
+       const res = await axios.post("/api/user/checkduplicate", {
+          username,email
+        });
+        const{data}=res
+        console.log(data)
+      } catch (error) {
+        if (error.response && error.response.data.message) {
+          if (error.response.data.message === "Email-exists") {
+            setDupeemailError("Email Id already exist");
+          } else if (error.response.data.message === "Username-exists") {
+            setDupeUsernameError("Username already exist");
+          }
+        }
+      }
+    };
+    
+      checkDuplicates();
+  
+  }, [username,email]);
+ 
 
   return (
     <div className="min-h-screen mt-20">
@@ -36,12 +74,12 @@ const signup = () => {
         <div className="flex-1">
           <Link to="/" className="font-bold dark:text-white text-4xl ">
             <span className="px-2 py-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-lg text-white">
-            Turbo
+              Turbo
             </span>{" "}
             Tribune
           </Link>
           <p className="text-sm mt-5">
-          Your destination for automotive insights and news. Industry trends,
+            Your destination for automotive insights and news. Industry trends,
             model releases, and technological advancements at your fingertips.
             Engage with expert opinions, in-depth features, and real-time
             updates.
@@ -59,20 +97,28 @@ const signup = () => {
                 type="text"
                 placeholder="Username"
                 id="username"
-                {...register("username", { required: "username is required",
-                  validate : {
+                {...register("username", {
+                  required: "username is required",
+                  validate: {
                     noSpaces: (value) => {
-                    const trimmedValue = value.trim();
-                    return (
-                      trimmedValue !== '' &&
-                      trimmedValue === value &&
-                      !trimmedValue.includes(' ') ||
-                      "Username cannot contain spaces"
-                    );
-                  },
-                    lowercase: (value) => {
-                      return value === value.toLowerCase() || "Username must be in lowercase";
+                      const trimmedValue = value.trim();
+                      return (
+                        (trimmedValue !== "" &&
+                          trimmedValue === value &&
+                          !trimmedValue.includes(" ")) ||
+                        "Username cannot contain spaces"
+                      );
                     },
+                    lowercase: (value) => {
+                      return (
+                        value === value.toLowerCase() ||
+                        "Username must be in lowercase"
+                      );
+                    },
+                  },
+                  minLength: {
+                    value: 5,
+                    message: "username must be more than 5 characters",
                   },
                 })}
               />
@@ -80,6 +126,9 @@ const signup = () => {
                 <p className="text-sm mt-2 text-red-500">
                   {errors.username.message}
                 </p>
+              )}
+              {DupeUsernameError && (
+                <p className="text-sm mt-2 text-red-500">{DupeUsernameError}</p>
               )}
             </div>
             <div className="">
@@ -101,6 +150,9 @@ const signup = () => {
                   {errors.email?.message}
                 </p>
               )}
+              {DupeemailError && (
+                <p className="text-sm mt-2 text-red-500">{DupeemailError}</p>
+              )}
             </div>
             <div className="">
               <Label value="Your Password" className="" />
@@ -110,9 +162,20 @@ const signup = () => {
                 id="password"
                 {...register("password", {
                   required: "password is required",
+                  validate: {
+                    noSpaces: (value) => {
+                      const trimmedValue = value.trim();
+                      return (
+                        (trimmedValue !== "" &&
+                          trimmedValue === value &&
+                          !trimmedValue.includes(" ")) ||
+                        "Password cannot contain spaces"
+                      );
+                    },
+                  },
                   minLength: {
-                    value :4,
-                    message : "Password must be more than 4 characters"
+                    value: 5,
+                    message: "Password must be more than 5 characters",
                   },
                 })}
               />
@@ -122,10 +185,14 @@ const signup = () => {
                 </p>
               )}
             </div>
-            <Button gradientDuoTone="purpleToPink" type="submit" disabled={Loading}>
-            {Loading? "Loading.." : ' Sign Up'}
+            <Button
+              gradientDuoTone="purpleToPink"
+              type="submit"
+              disabled={Loading}
+            >
+              {Loading ? "Loading.." : " Sign Up"}
             </Button>
-            <Oauth/>
+            <Oauth />
           </form>
           <div className="flex mt-5 gap-2">
             <span>Have an account?</span>

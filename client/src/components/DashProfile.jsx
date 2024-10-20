@@ -4,29 +4,41 @@ import { useDispatch, useSelector } from "react-redux";
 import { app } from "../firebase";
 import { CircularProgressbar } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
-import {getDownloadURL, getStorage, ref, uploadBytesResumable,} from "firebase/storage";
+import {
+  getDownloadURL,
+  getStorage,
+  ref,
+  uploadBytesResumable,
+} from "firebase/storage";
 import { useForm } from "react-hook-form";
 import axios from "axios";
-import { signInStart,signInSuccess, signInFailure, clearUserFailure,clearUserStart,clearUserSuccess } from "../redux/user/userSlice"; 
-import {HiOutlineExclamationCircle} from 'react-icons/hi'
+import {
+  signInStart,
+  signInSuccess,
+  signInFailure,
+  clearUserFailure,
+  clearUserStart,
+  clearUserSuccess,
+} from "../redux/user/userSlice";
+import { HiOutlineExclamationCircle } from "react-icons/hi";
 
 const DashProfile = () => {
-  const { currentUser,error,loading } = useSelector((state) => state.user); 
+  const { currentUser, error, loading } = useSelector((state) => state.user);
   const [imageFile, setImageFile] = useState(null);
   const [filePercentage, setfilePercentage] = useState(null);
   const [fileUploadError, setfileUploadError] = useState(false);
   const [profilePicture, setprofilePicture] = useState(null);
-  const [showModal, setShowModal] = useState(false)
+  const [showModal, setShowModal] = useState(false);
   const filepickRef = useRef();
 
   const {
     register,
     reset,
     handleSubmit,
-    formState: { errors,dirtyFields},
-  } = useForm({ mode: "onChange", defaultValues : {...currentUser} });
+    formState: { errors, dirtyFields },
+  } = useForm({ mode: "onChange", defaultValues: { ...currentUser } });
 
-const dispatch = useDispatch()
+  const dispatch = useDispatch();
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -47,7 +59,8 @@ const dispatch = useDispatch()
     const fileName = new Date().getTime() + imageFile.name;
     const storageRef = ref(storage, fileName);
     const uploadTask = uploadBytesResumable(storageRef, imageFile);
-    uploadTask.on("state_changed",
+    uploadTask.on(
+      "state_changed",
       (snapshot) => {
         const progress =
           (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
@@ -68,53 +81,53 @@ const dispatch = useDispatch()
   };
 
   const handleUpdate = async (formData) => {
-    const updatedValues = {}
-    if(dirtyFields.username){
-      updatedValues.username = formData.username
+    const updatedValues = {};
+    if (dirtyFields.username) {
+      updatedValues.username = formData.username;
     }
-    if(dirtyFields.email){
-      updatedValues.email = formData.email
+    if (dirtyFields.email) {
+      updatedValues.email = formData.email;
     }
-    if(dirtyFields.password){
-      updatedValues.password = formData.password
+    if (dirtyFields.password) {
+      updatedValues.password = formData.password;
     }
-    if(profilePicture){
-      updatedValues.profilePicture = profilePicture
+    if (profilePicture) {
+      updatedValues.profilePicture = profilePicture;
     }
-    reset({},{keepValues: true})
-    if(Object.keys(updatedValues).length === 0) return ;
+    reset({}, { keepValues: true });
+    if (Object.keys(updatedValues).length === 0) return;
     try {
-      dispatch(signInStart())
-      const res = await axios.put(`/api/user/update/${currentUser._id}`,{
-        ...updatedValues
-      })
+      dispatch(signInStart());
+      const res = await axios.put(`/api/user/update/${currentUser._id}`, {
+        ...updatedValues,
+      });
       const data = res.data;
-      dispatch(signInSuccess(data))
+      dispatch(signInSuccess(data));
     } catch (error) {
-      if(error.response){
-        dispatch(signInFailure(error.response.data.message))
-       }else{
-         dispatch(signInFailure(error.message))
-       }
+      if (error.response) {
+        dispatch(signInFailure(error.response.data.message));
+      } else {
+        dispatch(signInFailure(error.message));
+      }
     }
   };
 
-  const handleDeleteAccount = async()=>{
-    setShowModal(false)
+  const handleDeleteAccount = async () => {
+    setShowModal(false);
     try {
-      dispatch(clearUserStart())
-      const res = await axios.delete(`/api/user/delete/${currentUser._id}`)
+      dispatch(clearUserStart());
+      const res = await axios.delete(`/api/user/delete/${currentUser._id}`);
       const data = res.data;
-      dispatch(clearUserSuccess(data))
+      dispatch(clearUserSuccess(data));
     } catch (error) {
-      if(error.response){
-        dispatch(clearUserFailure(error.response.data.message))
-       }else{
-         dispatch(clearUserFailure(error.message))
-       }
+      if (error.response) {
+        dispatch(clearUserFailure(error.response.data.message));
+      } else {
+        dispatch(clearUserFailure(error.message));
+      }
     }
-  }
- 
+  };
+
   return (
     <div className="mx-auto max-w-lg w-full p-3 ">
       <h1 className="my-7 text-center font-semibold text-3xl">Profile</h1>
@@ -196,7 +209,6 @@ const dispatch = useDispatch()
         <Label value="Your email" />
         <TextInput
           type="email"
-         
           placeholder="email"
           {...register("email", {
             required: "email is required",
@@ -210,20 +222,22 @@ const dispatch = useDispatch()
           <p className="text-sm mt-2 text-red-500">{errors.email?.message}</p>
         )}
         <Label value="Your paswword" />
-        <TextInput type="password" placeholder="Password" 
-         {...register("password", {
-          minLength: {
-            value :4,
-            message : "Password must be more than 4 characters"
-          }
-        })}
+        <TextInput
+          type="password"
+          placeholder="Password"
+          {...register("password", {
+            minLength: {
+              value: 4,
+              message: "Password must be more than 4 characters",
+            },
+          })}
         />
-         {errors.password && (
-                <p className="text-sm mt-2 text-red-500">
-                  {errors.password?.message}
-                </p>
-              )}
-        <Button type="submit"  gradientDuoTone="purpleToBlue" className="mt-4">
+        {errors.password && (
+          <p className="text-sm mt-2 text-red-500">
+            {errors.password?.message}
+          </p>
+        )}
+        <Button type="submit" gradientDuoTone="purpleToBlue" className="mt-4">
           Update
         </Button>
         <Button
@@ -231,26 +245,39 @@ const dispatch = useDispatch()
           className="mb-5"
           outline
           type="button"
-          onClick={()=>setShowModal(true)}
+          onClick={() => setShowModal(true)}
         >
           Delete Account
         </Button>
       </form>
       {error && (
-        <Alert color='failure' className="mb-4">{error}</Alert>
+        <Alert color="failure" className="mb-4">
+          {error}
+        </Alert>
       )}
-      <Modal show={showModal} onClose={()=>setShowModal(false)} popup size='md'>
-              <Modal.Header/>
-              <Modal.Body>
-                <div className="text-center">
-                  <HiOutlineExclamationCircle className="h-14 w-14 text-gray-400 dark:text-gray-200 mb-4 mx-auto"/>
-                  <h3 className="mb-5 text-lg text-gray-600">Are you sure that you want to delete your account?</h3>
-                </div>
-                <div className="flex justify-center gap-4">
-                  <Button color='success' onClick={()=>setShowModal(false)}>No, Cancel</Button>
-                  <Button color='failure' onClick={handleDeleteAccount}>Yes, i'm sure</Button>
-                </div>
-              </Modal.Body>
+      <Modal
+        show={showModal}
+        onClose={() => setShowModal(false)}
+        popup
+        size="md"
+      >
+        <Modal.Header />
+        <Modal.Body>
+          <div className="text-center">
+            <HiOutlineExclamationCircle className="h-14 w-14 text-gray-400 dark:text-gray-200 mb-4 mx-auto" />
+            <h3 className="mb-5 text-lg text-gray-600">
+              Are you sure that you want to delete your account?
+            </h3>
+          </div>
+          <div className="flex justify-center gap-4">
+            <Button color="success" onClick={() => setShowModal(false)}>
+              No, Cancel
+            </Button>
+            <Button color="failure" onClick={handleDeleteAccount}>
+              Yes, i'm sure
+            </Button>
+          </div>
+        </Modal.Body>
       </Modal>
     </div>
   );
