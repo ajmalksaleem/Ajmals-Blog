@@ -66,12 +66,12 @@ const header = () => {
           onChange={(e)=>setSearchTerm(e.target.value)}
         />
       </form>
-      <Button className="w-12 h-10 lg:hidden aliign" color="gray" pill onClick={()=>navigate('/search')}>
+      <Button className="w-12 h-10 lg:hidden " color="gray" pill onClick={()=>navigate('/search')}>
         <AiOutlineSearch className="mt-0.5 " />
       </Button>
       <div className="flex gap-2 md:order-2">
         <Button
-          className="inline mr-2 focus:ring-0 "
+          className="inline mr-2 focus:ring-0 w-12 h-10"
           color="gray"
           pill
           onClick={() => dispatch(toggleTheme())}
