@@ -9,6 +9,7 @@ import { useForm } from "react-hook-form";
 import axios from "axios";
 import { signInStart,signInSuccess, signInFailure, clearUserFailure,clearUserStart,clearUserSuccess } from "../redux/user/userSlice"; 
 import {HiOutlineExclamationCircle} from 'react-icons/hi'
+import { FaCameraRetro } from "react-icons/fa";
 
 const DashProfile = () => {
   const { currentUser,error,loading } = useSelector((state) => state.user); 
@@ -159,6 +160,9 @@ const dispatch = useDispatch()
               ${filePercentage && filePercentage < 100 && "opacity-60"}
               `}
           />
+            <div className="absolute inset-0 rounded-full  opacity-0 transition-opacity duration-300 bg-black bg-opacity-50 hover:opacity-100"
+                        ><FaCameraRetro className="w-6 h-6 text-white mx-auto my-12 " />
+                        </div>
         </div>
         {fileUploadError && (
           <Alert color="failure">
