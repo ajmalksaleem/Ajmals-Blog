@@ -59,11 +59,13 @@ export const editComments = async(req,res,next)=>{
     try {
         const comment = await Comment.findOne({_id: req.params.commentId});
         if (!comment) return next(errorHandler(404, "comment not found"));
-        if (comment.userId !== req.user.id && !req.user.isAdmin) {
+        if (comment.userId.toString() !== req.user.id ) {
             return next(
               errorHandler(403, 'You are not allowed to edit this comment')
             );
           }
+          console.log(comment.userId)
+          console.log(req.user.id)
           const editedComment = await Comment.findByIdAndUpdate(req.params.commentId,{
             content : req.body.content
           },{new:true})
@@ -77,7 +79,7 @@ export const deleteComments = async(req,res,next)=>{
   try {
     const comment = await Comment.findOne({_id: req.params.commentId});
         if (!comment) return next(errorHandler(404, "comment not found"));
-        if (comment.userId !== req.user.id && !req.user.isAdmin) {
+        if (comment.userId.toString() !== req.user.id && !req.user.isAdmin) {
             return next(
               errorHandler(403, 'You are not allowed to edit this comment')
             );

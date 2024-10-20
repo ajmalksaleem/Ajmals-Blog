@@ -231,12 +231,12 @@ const CommentSection = ({ postId }) => {
                         " " +
                         (comment.numberOfLikes === 1 ? "like" : "likes")}
                   </p>
-                  {(comment.userId=== currentUser?._id) && (
+                  {(comment.userId?._id === currentUser?._id) && (
                     <button onClick={()=>handlecommentEdit(comment._id,comment.content)} className="hover:text-blue-500 text-gray-700 dark:text-gray-300 dark:hover:text-blue-500">
                       edit
                     </button>
                   )}
-                  {(comment.userId === currentUser?._id || currentUser?.isAdmin) && (
+                  {(comment.userId?._id === currentUser?._id || currentUser?.isAdmin) && (
                     <button onClick={()=>{
                     setshowdeleteModal(true)
                     seteditCommentId(comment._id)
