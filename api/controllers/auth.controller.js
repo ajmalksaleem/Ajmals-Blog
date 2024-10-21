@@ -15,9 +15,30 @@ export const signup = async (req, res, next) => {
   ) {
     return next(errorHandler(400, "All field required"));
   }
-  const hashedPassword = bcryptjs.hashSync(password, 10);
-  const newUser = new User({ username, email, password: hashedPassword });
   try {
+  if(username.length < 5 || username.length > 20 ) return next( errorHandler(401, "username must be between 5 and 20 charectors"))
+    if (username.includes(" ")){
+      return next(errorHandler(400, "Username cannot contain spaces"));
+    }
+    if (username !== username.toLowerCase()){
+      return next(errorHandler(400, "username must be in lowercase"));
+    }
+    if (!username.match(/^[a-zA-Z0-9]+$/)) {
+      return next(
+        errorHandler(400, "username must contain only letters and numbers")
+      );
+    };
+    const findUserByUsername = await User.findOne({ username });
+    if (findUserByUsername) {
+      return next(errorHandler(400, "Username Already Exists"));
+    }
+    const findUserByEmail = await User.findOne({ email });
+      if (findUserByEmail) {
+        return next(errorHandler(400, "Email-Id Already exists "));
+      }
+  if(password.length < 5 ) return next(errorHandler(401, "password should be greater than 5 charectors"))
+  const hashedPassword = await bcryptjs.hash(password, 10);
+  const newUser = new User({ username, email, password: hashedPassword });
     await newUser.save();
     res.status(201).json("user created succesfully");
   } catch (error) {

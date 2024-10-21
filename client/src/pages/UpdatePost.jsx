@@ -10,6 +10,7 @@ import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate,useParams } from "react-router-dom";
 import { clearUserSuccess } from "../redux/user/userSlice";
+import carBodyTypes from "../assets/Data";
 
 const UpdatePost = () => {
   const [file, setFile] = useState(null);
@@ -124,11 +125,9 @@ const UpdatePost = () => {
             setFormdata({ ...formData, category: e.target.value })
           }>
             <option value="uncategorized">Select a category</option>
-            <option value="javascript">JavaScript</option>
-            <option value="react">React</option>
-            <option value="mongodb">mongodb</option>
-            <option value="nodejs">Nodejs</option>
-            <option value="css">css</option>
+            {carBodyTypes.map((bdtype)=>(
+            <option key={bdtype.id} value={bdtype.type}>{bdtype.type}</option>
+            ))}
           </Select>
         </div>
         <div className="flex gap-4 items-center justify-between border-4 border-teal-500 border-dotted p-3">
@@ -182,7 +181,7 @@ const UpdatePost = () => {
           }}
         />
         <Button  disabled={imageUploadProgress} type="submit" gradientDuoTone="purpleToBlue" className="mb-3">
-          update
+        {imageUploadProgress ? 'Image Uploading...' : "Update Post"}
         </Button>
         {publishError && (
             <Alert className="mb-6" color='failure'>{publishError}</Alert>

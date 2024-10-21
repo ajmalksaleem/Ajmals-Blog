@@ -62,7 +62,7 @@ const PostPage = () => {
       <img
         src={post?.image}
         alt={post?.title}
-        className="mt-10 p-3 max-h-[600px] md:h-96 w-full object-cover"
+        className="mt-10 p-3 px-4 max-h-[600px] md:max-h-[490px] md w-full object-cover"
       />
       <div className="flex justify-between p-3 border-b border-slate-500 mx-auto w-full max-w-5xl">
         <span>{post && moment(post.updatedAt).format("MMMM DD, YYYY")}</span>

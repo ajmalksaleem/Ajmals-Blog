@@ -141,8 +141,8 @@ const CreatePost = () => {
           required
           onChange={(value)=>{setQuilData({content:value})}}
         />
-        <Button type="submit" gradientDuoTone="purpleToBlue" className="mb-3">
-          Publish
+        <Button type="submit" disabled={imageUploadProgress} gradientDuoTone="purpleToBlue" className="mb-3">
+          {imageUploadProgress ? 'Image Uploading...' : "Create Post"}
         </Button>
         {publishError && (
             <Alert className="mb-6" color='failure'>{publishError}</Alert>

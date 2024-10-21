@@ -6,30 +6,43 @@ export const UpdateUser = async (req, res, next) => {
   if (req.user.id !== req.params.userId) {
     return next(errorHandler(401, "You are not allowed to update this user"));
   }
-  if (req.body.password) {
-    if (req.body.password.length < 4)
-      return next(
-        errorHandler(401, "password should be greater than 4 charectors")
-      );
-    req.body.password = bcryptjs.hashSync(req.body.password, 10);
-  }
+  try {
   if (req.body.username) {
     if (req.body.username.length < 5 || req.body.username.length > 20) {
       return next(
         errorHandler(401, "username must be between 5 and 20 charectors")
       );
     }
-    if (req.body.username.includes(" "))
+    if (req.body.username.includes(" ")){
       return next(errorHandler(400, "Username cannot contain spaces"));
-    if (req.body.username !== req.body.username.toLowerCase())
+    }
+    if (req.body.username !== req.body.username.toLowerCase()){
       return next(errorHandler(400, "username must be in lowercase"));
+    }
     if (!req.body.username.match(/^[a-zA-Z0-9]+$/)) {
       return next(
         errorHandler(400, "username must contain only letters and numbers")
       );
     }
+    const existingUsername = await User.findOne({ username:req.body.username });
+    if (existingUsername && existingUsername._id.toString() !== req.user.id) {
+      return next(errorHandler(400, "Username Already Exists"));
+    }
   }
-  try {
+  if(req.body.email){
+    const existingEmail = await User.findOne({ email:req.body.email });
+    if (existingEmail && existingEmail._id.toString() !== req.user.id) {
+      return next(errorHandler(400, "Email-Id already exists"));
+    }
+  }
+  if (req.body.password) {
+    if (req.body.password.length < 5){
+      return next(
+        errorHandler(401, "password should be greater than 5 charectors")
+      );
+    }
+    req.body.password = bcryptjs.hashSync(req.body.password, 10);
+  }
     const UpdatedUser = await User.findByIdAndUpdate(
       req.params.userId,
       {
@@ -131,7 +144,7 @@ export const CheckDuplicate = async (req, res, next) => {
 
 export const CheckUpdateDuplicate = async (req, res, next) => {
   const { username, email } = req.body;
-  if (!username && !email) return;
+  if (!username || !email) return;
   try {
     const existingUsername = await User.findOne({ username });
     const existingEmail = await User.findOne({ email });

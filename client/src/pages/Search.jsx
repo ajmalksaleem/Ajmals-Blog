@@ -129,13 +129,13 @@ const Search = () => {
       </div>
       <div className="w-full">
       {loading ? (
-        <div className="flex justify-center items-center min-h-screen">
+        <div className="flex justify-center  items-center min-h-screen">
         <Spinner size="xl" />
       </div>
       ) : (
         <>
         <h1 className="text-3xl font-semibold sm:border-b border-gray-500 p-3 mt-5">Post Results :</h1>
-        <div className='p-7 flex flex-wrap gap-6 sm:ml-10 mt-10'>
+        <div className='p-7 flex flex-wrap gap-6 sm:ml-10 mt-10 justify-center'>
           {!loading && posts.length === 0 && (
             <p className='text-xl text-gray-500'>No posts found.</p>
           )}
