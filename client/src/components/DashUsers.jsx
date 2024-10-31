@@ -6,6 +6,7 @@ import moment from "moment";
 import {HiOutlineExclamationCircle} from 'react-icons/hi'
 import { FaTimes, FaCheck } from "react-icons/fa";
 import { clearUserSuccess } from "../redux/user/userSlice";
+import toast from "react-hot-toast";
 
 const DashUsers = () => {
   const [Users, setUsers] = useState([]);
@@ -60,6 +61,7 @@ const DashUsers = () => {
         await axios.delete(`/api/user/delete/${deleteUserId}`)
         setUsers(prev=>prev.filter((user)=>user._id != deleteUserId))
       } catch (error) {
+        toast.error(error.response.data.message)
         if(error.response.data.message === 'NoToken'){
           dispatch(clearUserSuccess())
           return

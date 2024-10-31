@@ -63,9 +63,13 @@ export const UpdateUser = async (req, res, next) => {
 };
 
 export const DeleteUser = async (req, res, next) => {
-  if (!req.user.isAdmin && req.user.id !== req.params.userId)
+  if (!req.user.isAdmin && req.user.id !== req.params.userId.toString())
     return next(errorHandler(401, "You can only delete your own account"));
   try {
+  const finduser = await User.findById(req.params.userId) 
+  if(req.user.isAdmin && finduser.isAdmin && (req.user.id !== req.params.userId.toString())){
+    return next(errorHandler(400, "Admin account cant be deleted by other admins"))
+  }
     await User.findByIdAndDelete(req.params.userId);
     if (req.user.id === req.params.userId) res.clearCookie("access_token");
     res.status(200).json({ message: "user deleted" });
