@@ -19,6 +19,7 @@ const Signin = () => {
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors },
   } = useForm({ mode: "onChange" });
 
@@ -112,6 +113,16 @@ const Signin = () => {
               {Loading ? "Loading.." : " Sign In"}
             </Button>
             <Oauth />
+            <Button
+              gradientDuoTone="greenToBlue"
+              type="button"
+              onClick={() => {
+                setValue("email", "admin@turbotribune.com");
+                setValue("password", "passwordforadmin");
+              }}
+            >
+              Get Admin Credentials
+            </Button>
           </form>
           <div className="flex mt-5 gap-2">
             <span>Haven't registered?</span>
