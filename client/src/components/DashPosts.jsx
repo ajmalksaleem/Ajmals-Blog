@@ -19,7 +19,7 @@ const DashPosts = () => {
     const fetchPost = async () => {
       try {
         const res = await axios.get(
-          `/api/post/getPosts?userId=${currentUser._id}`
+          `/api/post/getPosts?limit=9`
         );
         const { data } = res;
         setUserPosts(data.posts);
@@ -30,6 +30,9 @@ const DashPosts = () => {
       fetchPost();
     }
   }, [currentUser._id]);
+
+  console.log(Userposts);
+  
 
   const handleShowmore = async () => {
     const startIndex = Userposts.length;
@@ -132,7 +135,7 @@ const DashPosts = () => {
           )}
         </>
       ) : (
-        <p></p>
+        <p>You have no posts</p>
       )}
       <Modal show={showModal} onClose={()=>setShowModal(false)} popup size='md'>
               <Modal.Header/>
